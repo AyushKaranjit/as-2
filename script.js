@@ -1,112 +1,169 @@
-document.addEventListener('DOMContentLoaded', () => {
-    let gameStarted = false;
-    let score = 0;
-    let lives = 3;
-    const playerSpeed = 10;
+let gamestarted = false;
+const startbtn = document.querySelector('.startDiv');
 
-    const startButton = document.getElementById('startButton');
-    const scoreDisplay = document.getElementById('score');
-    const livesList = document.getElementById('livesList');
-    const main = document.querySelector('main');
+// Hide the start button and initialize the game
+function startGame() {
+    gamestarted = true;
+    startbtn.style.display = 'none';
+}
 
-    const player = document.createElement('div');
-    player.id = 'player';
-    main.appendChild(player);
+startbtn.addEventListener('click', startGame);
 
-    let playerTop = 0;
-    let playerLeft = 0;
+let upPressed = false;
+let downPressed = false;
+let leftPressed = false;
+let rightPressed = false;
 
-    const maze = [
-        [1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 0, 0, 0, 1, 0, 0, 1],
-        [1, 0, 1, 0, 1, 0, 1, 1],
-        [1, 0, 1, 0, 0, 0, 0, 1],
-        [1, 0, 1, 1, 1, 1, 0, 1],
-        [1, 0, 0, 0, 0, 1, 0, 1],
-        [1, 1, 1, 1, 0, 1, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1]
-    ];
+const main = document.querySelector('main');
 
-    function populateMaze() {
-        main.innerHTML = ''; // Clear the main element
-        for (let y = 0; y < maze.length; y++) {
-            for (let x = 0; x < maze[y].length; x++) {
-                let block = document.createElement('div');
-                block.classList.add('block');
+//Player = 2, Wall = 1, Enemy = 3, Point = 0
+let maze = [
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 2, 0, 1, 0, 0, 0, 0, 3, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1, 1, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 1, 1, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1, 1, 1],
+    [1, 0, 0, 1, 0, 3, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+    [1, 3, 1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+];
 
-                if (maze[y][x] === 1) {
-                    block.classList.add('wall');
-                } else {
-                    block.classList.add('point');
-                }
+//Populates the maze in the HTML
+for (let y of maze) {
+    for (let x of y) {
+        let block = document.createElement('div');
+        block.classList.add('block');
 
-                block.style.top = `${y * playerSpeed}px`;
-                block.style.left = `${x * playerSpeed}px`;
+        switch (x) {
+            case 1:
+                block.classList.add('wall');
+                break;
+            case 2:
+                block.id = 'player';
+                let mouth = document.createElement('div');
+                mouth.classList.add('mouth');
+                block.appendChild(mouth);
+                break;
+            case 3:
+                block.classList.add('enemy');
+                break;
+            default:
+                block.classList.add('point');
+                block.style.height = '1vh';
+                block.style.width = '1vh';
+                
+        }
 
-                main.appendChild(block);
+        main.appendChild(block);
+    }
+}
 
-                if (y === 1 && x === 1) {
-                    player.style.top = `${y * playerSpeed}px`;
-                    player.style.left = `${x * playerSpeed}px`;
-                }
+
+
+//Player movement
+function keyUp(event) {
+    if (event.key === 'ArrowUp') {
+        upPressed = false;
+    } else if (event.key === 'ArrowDown') {
+        downPressed = false;
+    } else if (event.key === 'ArrowLeft') {
+        leftPressed = false;
+    } else if (event.key === 'ArrowRight') {
+        rightPressed = false;
+    }
+}
+
+function keyDown(event) {
+    if (event.key === 'ArrowUp') {
+        upPressed = true;
+    } else if (event.key === 'ArrowDown') {
+        downPressed = true;
+    } else if (event.key === 'ArrowLeft') {
+        leftPressed = true;
+    } else if (event.key === 'ArrowRight') {
+        rightPressed = true;
+    }
+}
+
+const player = document.querySelector('#player');
+const playerMouth = player.querySelector('.mouth');
+player.style.width = '60%';
+player.style.height = '60%';
+playerMouth.style.height = '100%';
+let playerTop = 0;
+let playerLeft = 0;
+
+
+
+// Collision detection with walls
+function checkWallCollision() {
+    const playerRect = player.getBoundingClientRect();
+    const walls = document.querySelectorAll('.wall');
+
+    for (let wall of walls) {
+        const wallRect = wall.getBoundingClientRect();
+
+        if (
+            playerRect.top < wallRect.bottom &&
+            playerRect.bottom > wallRect.top &&
+            playerRect.left < wallRect.right &&
+            playerRect.right > wallRect.left
+        ) {
+            // Collision detected with wall
+            return true;
+        }
+    }
+
+    // No collision with walls
+    return false;
+}
+
+// Player movement
+function movePlayer() {
+    if (gamestarted) {
+            if (downPressed) {
+            playerTop++;
+            player.style.top = playerTop + 'px';
+            playerMouth.classList = 'down';
+
+            if (checkWallCollision()) {
+                playerTop--;
+                player.style.top = playerTop + 'px';
+            }
+        } else if (upPressed) {
+            playerTop--;
+            player.style.top = playerTop + 'px';
+            playerMouth.classList = 'up';
+
+            if (checkWallCollision()) {
+                playerTop++;
+                player.style.top = playerTop + 'px';
+            }
+        } else if (leftPressed) {
+            playerLeft--;
+            player.style.left = playerLeft + 'px';
+            playerMouth.classList = 'left';
+
+            if (checkWallCollision()) {
+                playerLeft++;
+                player.style.left = playerLeft + 'px';
+            }
+        } else if (rightPressed) {
+            playerLeft++;
+            player.style.left = playerLeft + 'px';
+            playerMouth.classList = 'right';
+
+            if (checkWallCollision()) {
+                playerLeft--;
+                player.style.left = playerLeft + 'px';
             }
         }
     }
+}
 
-    function initializeLives() {
-        for (let i = 0; i < lives; i++) {
-            let life = document.createElement('li');
-            livesList.appendChild(life);
-        }
-    }
+setInterval(movePlayer, 10);
 
-    function updateScore() {
-        scoreDisplay.textContent = `Score: ${score}`;
-    }
-
-    function movePlayer(event) {
-        if (!gameStarted) return;
-
-        let nextTop = playerTop;
-        let nextLeft = playerLeft;
-
-        switch (event.key) {
-            case 'ArrowUp':
-                nextTop -= playerSpeed;
-                break;
-            case 'ArrowDown':
-                nextTop += playerSpeed;
-                break;
-            case 'ArrowLeft':
-                nextLeft -= playerSpeed;
-                break;
-            case 'ArrowRight':
-                nextLeft += playerSpeed;
-                break;
-        }
-
-        if (!isCollision(nextTop, nextLeft)) {
-            playerTop = nextTop;
-            playerLeft = nextLeft;
-            player.style.top = `${playerTop}px`;
-            player.style.left = `${playerLeft}px`;
-        }
-    }
-
-    function isCollision(top, left) {
-        let row = Math.floor(top / playerSpeed);
-        let col = Math.floor(left / playerSpeed);
-        return maze[row][col] === 1;
-    }
-
-    startButton.addEventListener('click', () => {
-        gameStarted = true;
-        startButton.style.display = 'none';
-        populateMaze();
-        initializeLives();
-        updateScore();
-    });
-
-    document.addEventListener('keydown', movePlayer);
-});
+document.addEventListener('keydown', keyDown);
+document.addEventListener('keyup', keyUp);
