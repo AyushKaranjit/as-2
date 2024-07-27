@@ -130,6 +130,7 @@ div p {
     position: relative;
     width: 85%;
     height: 85%;
+
 }
 
 .enemy {
@@ -230,3 +231,4 @@ button:nth-child(4) { grid-area: downArrow; }
 .hit {
     animation: hitAnimation 1.5s ease-in-out;
 }
+
