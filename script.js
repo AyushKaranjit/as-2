@@ -1,3 +1,4 @@
+
 // Flag to track if the game has started
 let gameStarted = false; 
 const startBtn = document.querySelector('.startDiv');
@@ -12,7 +13,7 @@ function startGame() {
 // Event listener for the start button to trigger the startGame function
 startBtn.addEventListener('click', startGame);
 
-// Variables to track which keys are pressed
+// Flag to track which keys are pressed
 let upPressed = false;
 let downPressed = false;
 let leftPressed = false;
@@ -23,16 +24,41 @@ const main = document.querySelector('main');
 // Maze layout: 1 = Wall, 2 = Player, 3 = Enemy, 0 = Point
 let maze = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 2, 0, 1, 0, 0, 0, 0, 3, 1],
+    [1, 2, 0, 1, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 1, 1, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 1, 1, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 1, 1, 1],
-    [1, 0, 0, 1, 0, 3, 0, 0, 0, 1],
+    [1, 0, 0, 1, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 1, 0, 1],
-    [1, 3, 1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 1, 0, 0, 0, 0, 0, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ];
+
+// Number of enemies to place
+const numEnemies = 3;
+
+// Find all free spaces (0s) in the maze
+let freeSpaces = [];
+for (let y = 0; y < maze.length; y++) {
+    for (let x = 0; x < maze[y].length; x++) {
+        if (maze[y][x] === 0) {
+            freeSpaces.push({ x, y });
+        }
+    }
+}
+
+// Randomly place enemies in free spaces
+for (let i = 0; i < numEnemies; i++) {
+    if (freeSpaces.length === 0) break; // No more free spaces available
+    let randomIndex = Math.floor(Math.random() * freeSpaces.length);
+    let { x, y } = freeSpaces.splice(randomIndex, 1)[0];
+    maze[y][x] = 3; // Place enemy
+
+}
+
+
+
 
 // Populates the maze in the HTML based on the maze array
 for (let y of maze) {
@@ -63,6 +89,8 @@ for (let y of maze) {
         main.appendChild(block);
     }
 }
+
+
 
 // Event handlers to track key press states
 function keyUp(event) {
@@ -96,6 +124,104 @@ function keyDown(event) {
         console.log('ArrowRight pressed');
     }
 }
+
+// Helper function to generate a random direction (1: down, 2: up, 3: left, 4: right)
+function randomNumber() {
+    return Math.floor(Math.random() * 4) + 1;
+}
+
+// Collision detection with walls
+function checkWallCollisionEnemy() {
+    const enemies = document.querySelectorAll('.enemy');
+    const walls = document.querySelectorAll('.wall');
+
+    enemies.forEach(enemy => {
+        const enemyRect = enemy.getBoundingClientRect();
+
+        walls.forEach(wall => {
+            const wallRect = wall.getBoundingClientRect();
+
+            if (
+                enemyRect.top < wallRect.bottom &&
+                enemyRect.bottom > wallRect.top &&
+                enemyRect.left < wallRect.right &&
+                enemyRect.right > wallRect.left
+            ) {
+                // Collision detected with wall
+                console.log('Collision of enemy with wall detected');
+                return true;
+            }
+        });
+    });
+    return false;
+}
+
+// Function to move enemies
+function moveEnemies() {
+    if (!gameStarted) return;
+
+    const enemies = document.querySelectorAll('.enemy');
+
+    enemies.forEach(enemy => {
+        let enemyTop = parseInt(enemy.style.top) || 0;
+        let enemyLeft = parseInt(enemy.style.left) || 0;
+        let direction = enemy.direction || randomNumber();
+
+        // Default new positions are the same as current
+        let newTop = enemyTop;
+        let newLeft = enemyLeft;
+
+        switch (direction) {
+            case 1: // MOVE DOWN
+                newTop += 10;
+                if (checkWallCollisionEnemy(enemyLeft, newTop + enemy.offsetHeight) &&
+                    checkWallCollisionEnemy(enemyLeft + enemy.offsetWidth, newTop + enemy.offsetHeight)) {
+                    enemyTop = newTop+=2;
+                } else {
+                    direction = randomNumber();
+                }
+                break;
+
+            case 2: // MOVE UP
+                newTop -= 10;
+                if (!checkWallCollisionEnemy(enemyLeft, newTop) &&
+                    !checkWallCollisionEnemy(enemyLeft + enemy.offsetWidth, newTop)) {
+                    enemyTop = newTop;
+                } else {
+                    direction = randomNumber();
+                }
+                break;
+
+            case 3: // MOVE LEFT
+                newLeft -= 10;
+                if (!checkWallCollisionEnemy(newLeft, enemyTop) &&
+                    !checkWallCollisionEnemy(newLeft, enemyTop + enemy.offsetHeight)) {
+                    enemyLeft = newLeft;
+                } else {
+                    direction = randomNumber();
+                }
+                break;
+
+            case 4: // MOVE RIGHT
+                newLeft += 10;
+                if (!checkWallCollisionEnemy(newLeft + enemy.offsetWidth, enemyTop) &&
+                    !checkWallCollisionEnemy(newLeft + enemy.offsetWidth, enemyTop + enemy.offsetHeight)) {
+                    enemyLeft = newLeft;
+                } else {
+                    direction = randomNumber();
+                }
+                break;
+        }
+
+        // Update enemy position and direction
+        enemy.style.top = enemyTop + 'px';
+        enemy.style.left = enemyLeft + 'px';
+        enemy.direction = direction;
+    });
+}
+
+// Periodically call moveEnemies to update enemy positions
+setInterval(moveEnemies, 100); // Adjust the interval if needed
 
 // Initialize player and player mouth elements
 const player = document.querySelector('#player');
@@ -258,6 +384,57 @@ function checkEnemyCollision() {
 // Periodically check for enemy collisions
 setInterval(checkEnemyCollision, 10);
 
+
+
 // Event listeners for key down and up events
 document.addEventListener('keydown', keyDown);
 document.addEventListener('keyup', keyUp);
+
+// Add event listeners for the 'lbttn' button (left movement)
+document.getElementById('lbttn').addEventListener   ('mousedown', () => {
+    movePlayer('left');
+    leftPressed = true;
+    console.log('Left button pressed.');
+});
+  
+document.getElementById('lbttn').addEventListener('mouseup', () => {
+    leftPressed = false;
+    console.log('Left button released.');
+});
+
+// Add event listeners for the 'ubttn' button (up movement)
+document.getElementById('ubttn').addEventListener('mousedown', () => {
+    movePlayer('up');
+    upPressed = true; 
+    console.log('Up button pressed.');
+});
+  
+document.getElementById('ubttn').addEventListener('mouseup', () => {
+    upPressed = false;
+    console.log('Up button released.');
+});
+  
+  // Add event listeners for the 'rbttn' button (right movement)
+document.getElementById('rbttn').addEventListener('mousedown', () => {
+    movePlayer('right');
+    rightPressed = true;
+    console.log('Right button pressed.');
+});
+  
+document.getElementById('rbttn').addEventListener('mouseup', () => {
+    rightPressed = false;
+    console.log('Right button released.');
+});
+  
+  // Add event listeners for the 'dbttn' button (down movement)
+document.getElementById('dbttn').addEventListener('mousedown', () => {
+    movePlayer('down');
+    downPressed = true;
+    console.log('Down button pressed.');
+});
+  
+document.getElementById('dbttn').addEventListener('mouseup', () => {
+    downPressed = false;
+    console.log('Down button released.');
+});
+  
