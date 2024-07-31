@@ -57,9 +57,6 @@ for (let i = 0; i < numEnemies; i++) {
 
 }
 
-
-
-
 // Populates the maze in the HTML based on the maze array
 for (let y of maze) {
     for (let x of y) {
@@ -125,103 +122,90 @@ function keyDown(event) {
     }
 }
 
-// Helper function to generate a random direction (1: down, 2: up, 3: left, 4: right)
+//Enemy Movement
 function randomNumber() {
     return Math.floor(Math.random() * 4) + 1;
-}
+};
 
-// Collision detection with walls
-function checkWallCollisionEnemy() {
-    const enemies = document.querySelectorAll('.enemy');
-    const walls = document.querySelectorAll('.wall');
+let direction = randomNumber();
 
-    enemies.forEach(enemy => {
-        const enemyRect = enemy.getBoundingClientRect();
-
-        walls.forEach(wall => {
-            const wallRect = wall.getBoundingClientRect();
-
-            if (
-                enemyRect.top < wallRect.bottom &&
-                enemyRect.bottom > wallRect.top &&
-                enemyRect.left < wallRect.right &&
-                enemyRect.right > wallRect.left
-            ) {
-                // Collision detected with wall
-                console.log('Collision of enemy with wall detected');
-                return true;
-            }
-        });
-    });
-    return false;
-}
-
-// Function to move enemies
 function moveEnemies() {
     if (!gameStarted) return;
+    enemies = document.querySelectorAll('.enemy');
 
-    const enemies = document.querySelectorAll('.enemy');
-
-    enemies.forEach(enemy => {
+    for (let enemy of enemies){
+        let enemyRect = enemy.getBoundingClientRect();
         let enemyTop = parseInt(enemy.style.top) || 0;
         let enemyLeft = parseInt(enemy.style.left) || 0;
         let direction = enemy.direction || randomNumber();
 
-        // Default new positions are the same as current
-        let newTop = enemyTop;
-        let newLeft = enemyLeft;
-
         switch (direction) {
             case 1: // MOVE DOWN
-                newTop += 10;
-                if (checkWallCollisionEnemy(enemyLeft, newTop + enemy.offsetHeight) &&
-                    checkWallCollisionEnemy(enemyLeft + enemy.offsetWidth, newTop + enemy.offsetHeight)) {
-                    enemyTop = newTop+=2;
+                newBottom = enemyRect.bottom + 12;
+                btmL = document.elementFromPoint(enemyRect.left, newBottom);
+                btmR = document.elementFromPoint(enemyRect.right, newBottom);
+
+                let hitEnemyBottom = false;
+
+                if (!hitEnemyBottom && btmL.classList.contains('wall') == false && btmR.classList.contains('wall') == false) {
+                    enemyTop += 12;
                 } else {
                     direction = randomNumber();
                 }
                 break;
 
             case 2: // MOVE UP
-                newTop -= 10;
-                if (!checkWallCollisionEnemy(enemyLeft, newTop) &&
-                    !checkWallCollisionEnemy(enemyLeft + enemy.offsetWidth, newTop)) {
-                    enemyTop = newTop;
+                newTop = enemyRect.top - 12;
+                topL = document.elementFromPoint(enemyRect.left, newTop);
+                topR = document.elementFromPoint(enemyRect.right, newTop);
+
+                let hitEnemyTop = false;
+
+                if (!hitEnemyTop && topL.classList.contains('wall') == false && topR.classList.contains('wall') == false) {
+                    enemyTop -= 12;
                 } else {
                     direction = randomNumber();
                 }
                 break;
 
             case 3: // MOVE LEFT
-                newLeft -= 10;
-                if (!checkWallCollisionEnemy(newLeft, enemyTop) &&
-                    !checkWallCollisionEnemy(newLeft, enemyTop + enemy.offsetHeight)) {
-                    enemyLeft = newLeft;
+                newLeft = enemyRect.left - 12;
+                leftTop = document.elementFromPoint(newLeft, enemyRect.top);
+                leftBottom = document.elementFromPoint(newLeft, enemyRect.bottom);
+
+                let hitEnemyLeft = false;
+
+                if (!hitEnemyLeft && leftTop.classList.contains('wall') == false && leftBottom.classList.contains('wall') == false) {
+                    enemyLeft -= 12;
                 } else {
                     direction = randomNumber();
                 }
                 break;
 
             case 4: // MOVE RIGHT
-                newLeft += 10;
-                if (!checkWallCollisionEnemy(newLeft + enemy.offsetWidth, enemyTop) &&
-                    !checkWallCollisionEnemy(newLeft + enemy.offsetWidth, enemyTop + enemy.offsetHeight)) {
-                    enemyLeft = newLeft;
+                newRight = enemyRect.right + 12;
+                rightTop = document.elementFromPoint(newRight, enemyRect.top);
+                rightBottom = document.elementFromPoint(newRight, enemyRect.bottom);
+
+                let hitEnemyRight = false;
+                
+                if (!hitEnemyRight && rightTop.classList.contains('wall') == false && rightBottom.classList.contains('wall') == false) {
+                    enemyLeft += 12;
                 } else {
                     direction = randomNumber();
                 }
                 break;
         }
 
-        // Update enemy position and direction
         enemy.style.top = enemyTop + 'px';
         enemy.style.left = enemyLeft + 'px';
         enemy.direction = direction;
-    });
+    };
 }
 
 // Periodically call moveEnemies to update enemy positions
-setInterval(moveEnemies, 100); // Adjust the interval if needed
+setInterval(moveEnemies, 100);
+
 
 // Initialize player and player mouth elements
 const player = document.querySelector('#player');

@@ -231,4 +231,3 @@ button:nth-child(4) { grid-area: downArrow; }
 .hit {
     animation: hitAnimation 1.5s ease-in-out;
 }
-
