@@ -142,12 +142,10 @@ function moveEnemies() {
         switch (direction) {
             case 1: // MOVE DOWN
                 newBottom = enemyRect.bottom + 12;
-                btmL = document.elementFromPoint(enemyRect.left, newBottom);
-                btmR = document.elementFromPoint(enemyRect.right, newBottom);
+                BottomLeft = document.elementFromPoint(enemyRect.left, newBottom);
+                BottomRight = document.elementFromPoint(enemyRect.right, newBottom);
 
-                let hitEnemyBottom = false;
-
-                if (!hitEnemyBottom && btmL.classList.contains('wall') == false && btmR.classList.contains('wall') == false) {
+                if (BottomLeft.classList.contains('wall') == false && BottomRight.classList.contains('wall') == false) {
                     enemyTop += 12;
                 } else {
                     direction = randomNumber();
@@ -156,12 +154,10 @@ function moveEnemies() {
 
             case 2: // MOVE UP
                 newTop = enemyRect.top - 12;
-                topL = document.elementFromPoint(enemyRect.left, newTop);
-                topR = document.elementFromPoint(enemyRect.right, newTop);
+                TopLeft = document.elementFromPoint(enemyRect.left, newTop);
+                TopRight = document.elementFromPoint(enemyRect.right, newTop);
 
-                let hitEnemyTop = false;
-
-                if (!hitEnemyTop && topL.classList.contains('wall') == false && topR.classList.contains('wall') == false) {
+                if (TopLeft.classList.contains('wall') == false && TopRight.classList.contains('wall') == false) {
                     enemyTop -= 12;
                 } else {
                     direction = randomNumber();
@@ -170,12 +166,10 @@ function moveEnemies() {
 
             case 3: // MOVE LEFT
                 newLeft = enemyRect.left - 12;
-                leftTop = document.elementFromPoint(newLeft, enemyRect.top);
-                leftBottom = document.elementFromPoint(newLeft, enemyRect.bottom);
+                TopLeft = document.elementFromPoint(newLeft, enemyRect.top);
+                BottomLeft = document.elementFromPoint(newLeft, enemyRect.bottom);
 
-                let hitEnemyLeft = false;
-
-                if (!hitEnemyLeft && leftTop.classList.contains('wall') == false && leftBottom.classList.contains('wall') == false) {
+                if (TopLeft.classList.contains('wall') == false && BottomLeft.classList.contains('wall') == false) {
                     enemyLeft -= 12;
                 } else {
                     direction = randomNumber();
@@ -184,12 +178,10 @@ function moveEnemies() {
 
             case 4: // MOVE RIGHT
                 newRight = enemyRect.right + 12;
-                rightTop = document.elementFromPoint(newRight, enemyRect.top);
-                rightBottom = document.elementFromPoint(newRight, enemyRect.bottom);
+                TopRight = document.elementFromPoint(newRight, enemyRect.top);
+                BottomRight = document.elementFromPoint(newRight, enemyRect.bottom);
 
-                let hitEnemyRight = false;
-                
-                if (!hitEnemyRight && rightTop.classList.contains('wall') == false && rightBottom.classList.contains('wall') == false) {
+                if (TopRight.classList.contains('wall') == false && BottomRight.classList.contains('wall') == false) {
                     enemyLeft += 12;
                 } else {
                     direction = randomNumber();
