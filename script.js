@@ -367,13 +367,24 @@ document.addEventListener('keydown', keyDown);
 document.addEventListener('keyup', keyUp);
 
 // Add event listeners for the 'lbttn' button (left movement)
-document.getElementById('lbttn').addEventListener   ('mousedown', () => {
+document.getElementById('lbttn').addEventListener('mousedown', () => {
     movePlayer('left');
     leftPressed = true;
     console.log('Left button pressed.');
 });
   
 document.getElementById('lbttn').addEventListener('mouseup', () => {
+    leftPressed = false;
+    console.log('Left button released.');
+});
+
+document.getElementById('lbttn').addEventListener('touchstart', () => {
+    movePlayer('left');
+    leftPressed = true;
+    console.log('Left button pressed.');
+});
+  
+document.getElementById('lbttn').addEventListener('touchend', () => {
     leftPressed = false;
     console.log('Left button released.');
 });
@@ -389,8 +400,19 @@ document.getElementById('ubttn').addEventListener('mouseup', () => {
     upPressed = false;
     console.log('Up button released.');
 });
+
+document.getElementById('ubttn').addEventListener('touchstart', () => {
+    movePlayer('up');
+    upPressed = true; 
+    console.log('Up button pressed.');
+});
   
-  // Add event listeners for the 'rbttn' button (right movement)
+document.getElementById('ubttn').addEventListener('touchend', () => {
+    upPressed = false;
+    console.log('Up button released.');
+});
+
+// Add event listeners for the 'rbttn' button (right movement)
 document.getElementById('rbttn').addEventListener('mousedown', () => {
     movePlayer('right');
     rightPressed = true;
@@ -401,8 +423,19 @@ document.getElementById('rbttn').addEventListener('mouseup', () => {
     rightPressed = false;
     console.log('Right button released.');
 });
+
+document.getElementById('rbttn').addEventListener('touchstart', () => {
+    movePlayer('right');
+    rightPressed = true;
+    console.log('Right button pressed.');
+});
   
-  // Add event listeners for the 'dbttn' button (down movement)
+document.getElementById('rbttn').addEventListener('touchend', () => {
+    rightPressed = false;
+    console.log('Right button released.');
+});
+
+// Add event listeners for the 'dbttn' button (down movement)
 document.getElementById('dbttn').addEventListener('mousedown', () => {
     movePlayer('down');
     downPressed = true;
@@ -413,4 +446,16 @@ document.getElementById('dbttn').addEventListener('mouseup', () => {
     downPressed = false;
     console.log('Down button released.');
 });
+
+document.getElementById('dbttn').addEventListener('touchstart', () => {
+    movePlayer('down');
+    downPressed = true;
+    console.log('Down button pressed.');
+});
+  
+document.getElementById('dbttn').addEventListener('touchend', () => {
+    downPressed = false;
+    console.log('Down button released.');
+});
+
   
