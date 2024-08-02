@@ -1,3 +1,4 @@
+// GAME INITIALIZATION
 
 // Flag to track if the game has started
 let gameStarted = false; 
@@ -12,6 +13,10 @@ function startGame() {
 
 // Event listener for the start button to trigger the startGame function
 startBtn.addEventListener('click', startGame);
+ 
+// ===========================================================================================
+
+// MAZE LAYOUT
 
 // Flag to track which keys are pressed
 let upPressed = false;
@@ -35,26 +40,38 @@ let maze = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ];
 
-// Number of enemies to place
-const numEnemies = 3;
+// Randomized the maze layout each time the webpage is refreshed
+// function randomizedMaze() {
+//     let row = Math.floor(Math.random() * maze.length);
+//     let column = Math.floor(Math.random() * maze[row].length);
 
-// Find all free spaces (0s) in the maze
-let freeSpaces = [];
-for (let y = 0; y < maze.length; y++) {
-    for (let x = 0; x < maze[y].length; x++) {
-        if (maze[y][x] === 0) {
-            freeSpaces.push({ x, y });
-        }
+//     if (maze[row][column] == 0) {
+//         maze[row][column] = 1;
+//     }
+//     else {
+//         randomizedMaze();
+//     }
+// }  
+
+// for (let i = 0; i < 2; i++) {
+//     randomizedMaze();
+// }
+
+// Randomized the enemy placement each time the webpage is refreshed
+function randomizedEnemy() {
+    let row = Math.floor(Math.random() * maze.length);
+    let column = Math.floor(Math.random() * maze[row].length);
+
+    if (maze[row][column] == 0) {
+        maze[row][column] = 3;
+    }
+    else {
+        randomizedEnemy();
     }
 }
 
-// Randomly place enemies in free spaces
-for (let i = 0; i < numEnemies; i++) {
-    if (freeSpaces.length === 0) break; // No more free spaces available
-    let randomIndex = Math.floor(Math.random() * freeSpaces.length);
-    let { x, y } = freeSpaces.splice(randomIndex, 1)[0];
-    maze[y][x] = 3; // Place enemy
-
+for (let i = 0; i < 3; i++) {
+    randomizedEnemy();
 }
 
 // Populates the maze in the HTML based on the maze array
@@ -63,7 +80,6 @@ for (let y of maze) {
         let block = document.createElement('div');
         block.classList.add('block');
 
-        // Add appropriate classes and IDs to each block based on maze value
         switch (x) {
             case 1:
                 block.classList.add('wall');
@@ -87,9 +103,10 @@ for (let y of maze) {
     }
 }
 
+// ===========================================================================================
 
+// EVENT HANDLERS TO TRACK KEY PRESS STATES
 
-// Event handlers to track key press states
 function keyUp(event) {
     if (event.key === 'ArrowUp') {
         upPressed = false;
@@ -122,88 +139,98 @@ function keyDown(event) {
     }
 }
 
-//Enemy Movement
+// ===========================================================================================
+
+// ENEMY MOVEMENT
+
+// Function to generate a random number between 1 and 4
 function randomNumber() {
     return Math.floor(Math.random() * 4) + 1;
-};
+}
 
 let direction = randomNumber();
 
+// Collision detection with walls for enemies
+function checkWallCollisionForEnemy(enemy) {
+    const enemyRect = enemy.getBoundingClientRect();
+    const walls = document.querySelectorAll('.wall');
+
+    for (let wall of walls) {
+        const wallRect = wall.getBoundingClientRect();
+
+        if (
+            enemyRect.top < wallRect.bottom &&
+            enemyRect.bottom > wallRect.top &&
+            enemyRect.left < wallRect.right &&
+            enemyRect.right > wallRect.left
+        ) {
+            // Collision detected with wall
+            console.log('Collision of enemy with wall detected');
+            return true;
+        }
+    }
+
+    // No collision with walls
+    return false;
+}
+
+// Function to move the enemies
 function moveEnemies() {
-    if (!gameStarted) return;
+    if (!gameStarted) return; {
     enemies = document.querySelectorAll('.enemy');
 
-    for (let enemy of enemies){
-        let enemyRect = enemy.getBoundingClientRect();
-        let enemyTop = parseInt(enemy.style.top) || 0;
-        let enemyLeft = parseInt(enemy.style.left) || 0;
-        let direction = enemy.direction || randomNumber();
+        for (let enemy of enemies) {
+            let enemyTop = parseInt(enemy.style.top) || 0;
+            let enemyLeft = parseInt(enemy.style.left) || 0;
+            let direction = enemy.direction || randomNumber();
 
-        switch (direction) {
-            case 1: // MOVE DOWN
-                newBottom = enemyRect.bottom + 12;
-                BottomLeft = document.elementFromPoint(enemyRect.left, newBottom);
-                BottomRight = document.elementFromPoint(enemyRect.right, newBottom);
-
-                if (BottomLeft.classList.contains('wall') == false && BottomRight.classList.contains('wall') == false) {
-                    enemyTop += 12;
-                } else {
+            if (direction === 1) { // MOVE DOWN
+                enemy.style.top = (enemyTop + 12) + 'px';
+                if (checkWallCollisionForEnemy(enemy)) {
+                    enemy.style.top = enemyTop + 'px';
                     direction = randomNumber();
                 }
-                break;
+            }
 
-            case 2: // MOVE UP
-                newTop = enemyRect.top - 12;
-                TopLeft = document.elementFromPoint(enemyRect.left, newTop);
-                TopRight = document.elementFromPoint(enemyRect.right, newTop);
-
-                if (TopLeft.classList.contains('wall') == false && TopRight.classList.contains('wall') == false) {
-                    enemyTop -= 12;
-                } else {
+            if (direction === 2) { // MOVE UP
+                enemy.style.top = (enemyTop - 12) + 'px';
+                if (checkWallCollisionForEnemy(enemy)) {
+                    enemy.style.top = enemyTop + 'px';
                     direction = randomNumber();
                 }
-                break;
+            }
 
-            case 3: // MOVE LEFT
-                newLeft = enemyRect.left - 12;
-                TopLeft = document.elementFromPoint(newLeft, enemyRect.top);
-                BottomLeft = document.elementFromPoint(newLeft, enemyRect.bottom);
-
-                if (TopLeft.classList.contains('wall') == false && BottomLeft.classList.contains('wall') == false) {
-                    enemyLeft -= 12;
-                } else {
+            if (direction === 3) { // MOVE LEFT
+                enemy.style.left = (enemyLeft - 12) + 'px';
+                if (checkWallCollisionForEnemy(enemy)) {
+                    enemy.style.left = enemyLeft + 'px';
                     direction = randomNumber();
                 }
-                break;
+            }
 
-            case 4: // MOVE RIGHT
-                newRight = enemyRect.right + 12;
-                TopRight = document.elementFromPoint(newRight, enemyRect.top);
-                BottomRight = document.elementFromPoint(newRight, enemyRect.bottom);
-
-                if (TopRight.classList.contains('wall') == false && BottomRight.classList.contains('wall') == false) {
-                    enemyLeft += 12;
-                } else {
+            if (direction === 4) { // MOVE RIGHT
+                enemy.style.left = (enemyLeft + 12) + 'px';
+                if (checkWallCollisionForEnemy(enemy)) {
+                    enemy.style.left = enemyLeft + 'px';
                     direction = randomNumber();
                 }
-                break;
+            }
+
+            enemy.direction = direction;
         }
-
-        enemy.style.top = enemyTop + 'px';
-        enemy.style.left = enemyLeft + 'px';
-        enemy.direction = direction;
-    };
+    }
 }
 
 // Periodically call moveEnemies to update enemy positions
 setInterval(moveEnemies, 100);
 
+// ===========================================================================================
+
+// PLAYER MOVEMENT
 
 // Initialize player and player mouth elements
 const player = document.querySelector('#player');
 const playerMouth = player.querySelector('.mouth');
-player.style.width = '85%';
-playerMouth.style.height = '100%';
 let playerTop = 0;
 let playerLeft = 0;
 
@@ -216,7 +243,7 @@ function movePlayer() {
             player.style.top = playerTop + 'px';
             playerMouth.classList = 'down';
 
-            if (checkWallCollision()) {
+            if (checkWallCollisionForPlayer()) {
                 playerTop = playerTop - 2;
                 player.style.top = playerTop + 'px';
             }
@@ -230,7 +257,7 @@ function movePlayer() {
             player.style.top = playerTop + 'px';
             playerMouth.classList = 'up';
 
-            if (checkWallCollision()) {
+            if (checkWallCollisionForPlayer()) {
                 playerTop = playerTop + 2;
                 player.style.top = playerTop + 'px';
             }
@@ -244,7 +271,7 @@ function movePlayer() {
             player.style.left = playerLeft + 'px';
             playerMouth.classList = 'left';
 
-            if (checkWallCollision()) {
+            if (checkWallCollisionForPlayer()) {
                 playerLeft = playerLeft + 2;
                 player.style.left = playerLeft + 'px';
             }
@@ -258,7 +285,7 @@ function movePlayer() {
             player.style.left = playerLeft + 'px';
             playerMouth.classList = 'right';
 
-            if (checkWallCollision()) {
+            if (checkWallCollisionForPlayer()) {
                 playerLeft = playerLeft - 2;
                 player.style.left = playerLeft + 'px';
             }
@@ -272,8 +299,8 @@ function movePlayer() {
 // Periodically call movePlayer to update player position
 setInterval(movePlayer, 10);
 
-// Collision detection with walls
-function checkWallCollision() {
+// Collision detection with walls for players
+function checkWallCollisionForPlayer() {
     const playerRect = player.getBoundingClientRect();
     const walls = document.querySelectorAll('.wall');
 
@@ -287,7 +314,7 @@ function checkWallCollision() {
             playerRect.right > wallRect.left
         ) {
             // Collision detected with wall
-            console.log('Collision with wall detected');
+            console.log('Collision of player with wall detected');
             return true;
         }
     }
@@ -306,9 +333,8 @@ function checkPointCollision() {
 
     if (points.length === 0) {
         if (confirm('Congratulations! You have collected all points. Your total score was ' + score + '. Do you want to play again?')) {
-            console.log('All points collected. Reloading game.');
             setTimeout(() => {
-            window.location.reload();
+            location.reload();
             }, 1);
         }
     }
@@ -345,12 +371,11 @@ function checkEnemyCollision() {
             playerRect.left < enemyRect.right &&
             playerRect.right > enemyRect.left
         ) {
-            // Collision detected with enemy
-            console.log('Collision with enemy detected. Game Over');
             player.classList.add('dead');
             setTimeout(() => {
-                if (confirm('Game Over. Your total score was ' + score + '. Do you want to play again?')) {
-                window.location.reload();
+                const playerName = prompt('Game Over. Your total score was ' + score + '. Please enter your name:');
+                if (confirm('Do you want to play again?')) {
+                    location.reload();
                 }
             }, 1);
         }
@@ -358,9 +383,11 @@ function checkEnemyCollision() {
 }
 
 // Periodically check for enemy collisions
-setInterval(checkEnemyCollision, 10);
+setInterval(checkEnemyCollision, 1);
 
+// ===========================================================================================
 
+// ALL THE EVENT LISTENERS
 
 // Event listeners for key down and up events
 document.addEventListener('keydown', keyDown);
@@ -368,7 +395,7 @@ document.addEventListener('keyup', keyUp);
 
 // Add event listeners for the 'lbttn' button (left movement)
 document.getElementById('lbttn').addEventListener('mousedown', () => {
-    movePlayer('left');
+    movePlayer('fgkfngjnfj,n');
     leftPressed = true;
     console.log('Left button pressed.');
 });
