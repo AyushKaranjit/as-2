@@ -233,10 +233,11 @@ const player = document.querySelector('#player');
 const playerMouth = player.querySelector('.mouth');
 let playerTop = 0;
 let playerLeft = 0;
+let isMoving = true;
 
 // Function to move the player based on key presses
 function movePlayer() {
-    if (gameStarted) {
+    if (gameStarted && isMoving) {
         // Move player down
         if (downPressed) {
             playerTop = playerTop + 2;
@@ -357,7 +358,38 @@ function checkPointCollision() {
     }
 }
 
-// Enemy Collision Detection
+//===========================================================================================
+
+// GAME OVER
+function gameOver() {
+
+    setTimeout(() => {
+        const playerName = prompt('Game Over. Your total score was ' + score + '. Please enter your name:');
+        if (confirm('Do you want to play again?')) {
+                    location.reload();
+         }
+    }, 1500);
+}
+
+// ===========================================================================================
+// ENEMY COLLISION
+let lives = 3;
+
+// Function to handle the hit animation and disable movement
+function EnemyHit() {
+    player.classList.add('hit');
+    isMoving = false;
+    setTimeout(() => {
+        player.classList.remove('hit');
+        isMoving = true;
+    }, 1500);
+}
+
+// Function to check for enemy collisions
+let gameOverState = false;
+let collisionCooldown = false;
+let collisionInterval = setInterval(checkEnemyCollision, 100);
+
 function checkEnemyCollision() {
     const playerRect = player.getBoundingClientRect();
     const enemies = document.querySelectorAll('.enemy');
@@ -371,19 +403,34 @@ function checkEnemyCollision() {
             playerRect.left < enemyRect.right &&
             playerRect.right > enemyRect.left
         ) {
-            player.classList.add('dead');
-            setTimeout(() => {
-                const playerName = prompt('Game Over. Your total score was ' + score + '. Please enter your name:');
-                if (confirm('Do you want to play again?')) {
-                    location.reload();
+            if (!gameOverState && !collisionCooldown) {
+                EnemyHit();
+                lives--;
+                console.log(`Life lost! Lives remaining: ${lives}`);
+                
+                // Set collision cooldown
+                collisionCooldown = true;
+                clearInterval(collisionInterval);
+                collisionInterval = setInterval(checkEnemyCollision, 2000);
+        
+                setTimeout(() => {
+                    collisionCooldown = false;
+                    clearInterval(collisionInterval);
+                    collisionInterval = setInterval(checkEnemyCollision, 100);
+                }, 2000); // 2 second cooldown
+        
+                // Check if all lives are lost
+                if (lives <= 0) {
+                    gameOverState = true;
+                    gameOver();
                 }
-            }, 1);
+            }
         }
     }
 }
 
 // Periodically check for enemy collisions
-setInterval(checkEnemyCollision, 1);
+setInterval(checkEnemyCollision, 100);
 
 // ===========================================================================================
 
