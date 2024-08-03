@@ -1,21 +1,36 @@
 // IMPORTANT the local storage has a limited amount of storage capacity, so after the capacity has been exceeded, the local storage will be full and the game will not be able to save any more scores and the game will not work. To fix this, you can clear the local storage by running localStorage.clear() in the console.
 
-// GAME INITIALIZATION
+// START BUTTON
 
-// Flag to track if the game has started
 let gameStarted = false; 
-const startBtn = document.querySelector('.startDiv');
+const startBtn = document.querySelector('.start');
 
-// Function to start the game: hides the start button and sets gameStarted to true
+// Function to start the game
 function startGame() {
     gameStarted = true;
+    restartBtn.style.display = 'none'; 
     startBtn.style.display = 'none';
     console.log('Game started');
 }
 
-// Event listener for the start button to trigger the startGame function
-startBtn.addEventListener('click', startGame);
- 
+// ===========================================================================================
+
+// RESTART BUTTON
+
+const restartBtn = document.querySelector('.restart');
+
+function restartGame() {
+    localStorage.setItem('restartFlag', 'true');
+    location.reload();
+}
+restartBtn.style.display = 'none';
+
+// Check if the page was reloaded to restart the game
+if (localStorage.getItem('restartFlag') === 'true') {
+    localStorage.removeItem('restartFlag');
+    startGame();
+}
+
 // ===========================================================================================
 
 // MAZE LAYOUT
@@ -335,11 +350,17 @@ function checkPointCollision() {
     const points = document.querySelectorAll('.point');
 
     if (points.length === 0) {
-        if (confirm('Congratulations! You have collected all points. Your total score was ' + score + '. Do you want to play again?')) {
-            setTimeout(() => {
-            location.reload();
-            }, 1);
-        }
+        gameStarted = false; 
+        setTimeout(() => {
+            const playerName = prompt('🎉🥳 Congratulations!! 🎉🥳 Your total score was ' + score + '. Please enter your name:');
+
+             // Save the player's name and score to local storage
+            let scores = JSON.parse(localStorage.getItem('scores')) || [];
+            scores.push({ name: playerName, score: score });
+            localStorage.setItem('scores', JSON.stringify(scores));
+            updateLeaderboard();
+            restartBtn.style.display = 'flex';
+        }, 100);
     }
 
     for (let point of points) {
@@ -364,21 +385,18 @@ function checkPointCollision() {
 
 // GAME OVER
 function gameOver() {
+    gameStarted = false;
     player.classList.add('dead');
     setTimeout(() => {
         const playerName = prompt('Game Over. Your total score was ' + score + '. Please enter your name:');
 
          // Save the player's name and score to local storage
-         let scores = JSON.parse(localStorage.getItem('scores')) || [];
-         scores.push({ name: playerName, score: score });
-         localStorage.setItem('scores', JSON.stringify(scores));
+        let scores = JSON.parse(localStorage.getItem('scores')) || [];
+        scores.push({ name: playerName, score: score });
+        localStorage.setItem('scores', JSON.stringify(scores));
          
-         // Update the leaderboard
-         updateLeaderboard();
-
-        if (confirm('Do you want to play again?')) {
-            location.reload();
-         }
+        updateLeaderboard();
+        restartBtn.style.display = 'flex';
     }, 3000);
 }
 
@@ -388,17 +406,24 @@ function gameOver() {
 function updateLeaderboard() {
     let scores = JSON.parse(localStorage.getItem('scores')) || [];
     
-   // Sort scores first by score in descending order, then by name in ascending order
-   scores.sort((a, b) => {
-    if (b.score === a.score) {
-        return a.name.localeCompare(b.name);
-    }
-    return b.score - a.score;
-});
-    
+    // Ensure all scores have a valid name
+    scores.forEach(score => {
+        if (!score.name) {
+            score.name = 'Anonymous';
+        }
+    });
+
+    // Sort scores first by score in descending order, then by name in ascending order
+    scores.sort((a, b) => {
+        if (b.score === a.score) {
+            return a.name.localeCompare(b.name);
+        }
+        return b.score - a.score;
+    });
+
     // Get the top 5 scores
     let topScores = scores.slice(0, 5);
-    
+
     // Display the top 5 scores in the .leaderboard div
     const leaderboard = document.querySelector('.leaderboard');
     leaderboard.innerHTML = '<h2>Leaderboard</h2><ol style="font-size: 1.5em;"></ol>';
@@ -407,8 +432,10 @@ function updateLeaderboard() {
         ol.innerHTML += `<li>${score.name}: ${score.score}</li>`;
     });
 }
+
 // Call updateLeaderboard to display the leaderboard
 updateLeaderboard();
+
 
 // ===========================================================================================
 
@@ -522,7 +549,12 @@ setInterval(checkEnemyCollision, 100);
 
 // Event listeners for key down and up events
 document.addEventListener('keydown', keyDown);
+
 document.addEventListener('keyup', keyUp);
+
+startBtn.addEventListener('click', startGame);
+
+restartBtn.addEventListener('click', restartGame);
 
 // Add event listeners for the 'lbttn' button (left movement)
 document.getElementById('lbttn').addEventListener('mousedown', () => {
