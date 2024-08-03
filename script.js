@@ -1,3 +1,5 @@
+// IMPORTANT the local storage has a limited amount of storage capacity, so after the capacity has been exceeded, the local storage will be full and the game will not be able to save any more scores and the game will not work. To fix this, you can clear the local storage by running localStorage.clear() in the console.
+
 // GAME INITIALIZATION
 
 // Flag to track if the game has started
@@ -365,20 +367,98 @@ function gameOver() {
     player.classList.add('dead');
     setTimeout(() => {
         const playerName = prompt('Game Over. Your total score was ' + score + '. Please enter your name:');
+
+         // Save the player's name and score to local storage
+         let scores = JSON.parse(localStorage.getItem('scores')) || [];
+         scores.push({ name: playerName, score: score });
+         localStorage.setItem('scores', JSON.stringify(scores));
+         
+         // Update the leaderboard
+         updateLeaderboard();
+
         if (confirm('Do you want to play again?')) {
             location.reload();
          }
     }, 3000);
 }
 
+//===========================================================================================
+
+// Function to update the leaderboard
+function updateLeaderboard() {
+    let scores = JSON.parse(localStorage.getItem('scores')) || [];
+    
+   // Sort scores first by score in descending order, then by name in ascending order
+   scores.sort((a, b) => {
+    if (b.score === a.score) {
+        return a.name.localeCompare(b.name);
+    }
+    return b.score - a.score;
+});
+    
+    // Get the top 5 scores
+    let topScores = scores.slice(0, 5);
+    
+    // Display the top 5 scores in the .leaderboard div
+    const leaderboard = document.querySelector('.leaderboard');
+    leaderboard.innerHTML = '<h2>Leaderboard</h2><ol style="font-size: 1.5em;"></ol>';
+    const ol = leaderboard.querySelector('ol');
+    topScores.forEach(score => {
+        ol.innerHTML += `<li>${score.name}: ${score.score}</li>`;
+    });
+}
+// Call updateLeaderboard to display the leaderboard
+updateLeaderboard();
+
 // ===========================================================================================
-// ENEMY COLLISION
+
+// UPDATE LIVES
+
 let lives = 3;
+
+// Function to display lives
+function displayLives() {
+    const livesContainer = document.createElement('div');
+    livesContainer.classList.add('lives');
+    
+    // Create and add the h1 element
+    const livesHeader = document.createElement('h1');
+    livesHeader.textContent = 'Lives:';
+    livesContainer.appendChild(livesHeader);
+    
+    const livesList = document.createElement('ul');
+    
+    for (let i = 0; i < lives; i++) {
+        const life = document.createElement('li');
+        life.classList.add('life');
+        livesList.appendChild(life);
+    }
+    
+    livesContainer.appendChild(livesList);
+    document.body.appendChild(livesContainer);
+}
+
+// Call displayLives at the start of the game
+displayLives();
+
+// Function to remove one life
+function removeLife() {
+    const livesContainer = document.querySelector('.lives ul');
+    if (livesContainer && livesContainer.children.length > 0) {
+        livesContainer.removeChild(livesContainer.children[0]);
+
+    }
+}
+
+// ===========================================================================================
+
+// ENEMY COLLISION
 
 // Function to handle the hit animation and disable movement
 function EnemyHit() {
     player.classList.add('hit');
     isMoving = false;
+    removeLife();
     setTimeout(() => {
         player.classList.remove('hit');
         isMoving = true;
@@ -387,6 +467,8 @@ function EnemyHit() {
         }
     }, 1500);
 }
+
+
 
 // Function to check for enemy collisions
 let gameOverState = false;
@@ -410,7 +492,8 @@ function checkEnemyCollision() {
                 EnemyHit();
                 lives--;
                 console.log(`Life lost! Lives remaining: ${lives}`);
-                
+                 
+
                 collisionCooldown = true;
                 clearInterval(collisionInterval);
                 collisionInterval = setInterval(checkEnemyCollision, 1500);
