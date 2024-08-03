@@ -362,13 +362,13 @@ function checkPointCollision() {
 
 // GAME OVER
 function gameOver() {
-
+    player.classList.add('dead');
     setTimeout(() => {
         const playerName = prompt('Game Over. Your total score was ' + score + '. Please enter your name:');
         if (confirm('Do you want to play again?')) {
-                    location.reload();
+            location.reload();
          }
-    }, 1500);
+    }, 3000);
 }
 
 // ===========================================================================================
@@ -382,11 +382,13 @@ function EnemyHit() {
     setTimeout(() => {
         player.classList.remove('hit');
         isMoving = true;
+        if (lives == 0) {
+            isMoving = false;
+        }
     }, 1500);
 }
 
 // Function to check for enemy collisions
-let gameOverState = false;
 let collisionCooldown = false;
 let collisionInterval = setInterval(checkEnemyCollision, 100);
 
@@ -403,25 +405,22 @@ function checkEnemyCollision() {
             playerRect.left < enemyRect.right &&
             playerRect.right > enemyRect.left
         ) {
-            if (!gameOverState && !collisionCooldown) {
+            if (!collisionCooldown) {
                 EnemyHit();
                 lives--;
                 console.log(`Life lost! Lives remaining: ${lives}`);
                 
-                // Set collision cooldown
                 collisionCooldown = true;
                 clearInterval(collisionInterval);
-                collisionInterval = setInterval(checkEnemyCollision, 2000);
+                collisionInterval = setInterval(checkEnemyCollision, 1500);
         
                 setTimeout(() => {
                     collisionCooldown = false;
                     clearInterval(collisionInterval);
                     collisionInterval = setInterval(checkEnemyCollision, 100);
-                }, 2000); // 2 second cooldown
+                }, 1500);
         
-                // Check if all lives are lost
-                if (lives <= 0) {
-                    gameOverState = true;
+                if (lives == 0) {
                     gameOver();
                 }
             }
