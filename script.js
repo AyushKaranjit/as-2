@@ -389,6 +389,7 @@ function EnemyHit() {
 }
 
 // Function to check for enemy collisions
+let gameOverState = false;
 let collisionCooldown = false;
 let collisionInterval = setInterval(checkEnemyCollision, 100);
 
@@ -405,7 +406,7 @@ function checkEnemyCollision() {
             playerRect.left < enemyRect.right &&
             playerRect.right > enemyRect.left
         ) {
-            if (!collisionCooldown) {
+            if (!gameOverState && !collisionCooldown) {
                 EnemyHit();
                 lives--;
                 console.log(`Life lost! Lives remaining: ${lives}`);
@@ -421,6 +422,7 @@ function checkEnemyCollision() {
                 }, 1500);
         
                 if (lives == 0) {
+                    gameOverState = true;
                     gameOver();
                 }
             }
