@@ -443,9 +443,9 @@ displayLives();
 
 // Function to remove one life
 function removeLife() {
-    const livesContainer = document.querySelector('.lives ul');
-    if (livesContainer && livesContainer.children.length > 0) {
-        livesContainer.removeChild(livesContainer.children[0]);
+    const livesUL = document.querySelector('.lives ul');
+    if (livesUL.children.length > 0) {
+        livesUL.removeChild(livesUL.children[0]);
 
     }
 }
@@ -615,5 +615,3 @@ document.getElementById('dbttn').addEventListener('touchend', () => {
     downPressed = false;
     console.log('Down button released.');
 });
-
-  
