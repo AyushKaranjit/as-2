@@ -242,12 +242,12 @@ function movePlayer() {
     if (gameStarted && isMoving) {
         // Move player down
         if (downPressed) {
-            playerTop = playerTop + 2;
+            playerTop = playerTop + 1.4;
             player.style.top = playerTop + 'px';
             playerMouth.classList = 'down';
 
             if (checkWallCollisionForPlayer()) {
-                playerTop = playerTop - 2;
+                playerTop = playerTop - 1.4;
                 player.style.top = playerTop + 'px';
             }
             if (checkPointCollision()) {
@@ -256,12 +256,12 @@ function movePlayer() {
         } 
         // Move player up
         else if (upPressed) {
-            playerTop = playerTop - 2;
+            playerTop = playerTop - 1.4;
             player.style.top = playerTop + 'px';
             playerMouth.classList = 'up';
 
             if (checkWallCollisionForPlayer()) {
-                playerTop = playerTop + 2;
+                playerTop = playerTop + 1.4;
                 player.style.top = playerTop + 'px';
             }
             if (checkPointCollision()) {
@@ -270,12 +270,12 @@ function movePlayer() {
         } 
         // Move player left
         else if (leftPressed) {
-            playerLeft = playerLeft - 2;
+            playerLeft = playerLeft - 1.4;
             player.style.left = playerLeft + 'px';
             playerMouth.classList = 'left';
 
             if (checkWallCollisionForPlayer()) {
-                playerLeft = playerLeft + 2;
+                playerLeft = playerLeft + 1.4;
                 player.style.left = playerLeft + 'px';
             }
             if (checkPointCollision()) {
@@ -284,12 +284,12 @@ function movePlayer() {
         } 
         // Move player right
         else if (rightPressed) {
-            playerLeft = playerLeft + 2;
+            playerLeft = playerLeft + 1.4;
             player.style.left = playerLeft + 'px';
             playerMouth.classList = 'right';
 
             if (checkWallCollisionForPlayer()) {
-                playerLeft = playerLeft - 2;
+                playerLeft = playerLeft - 1.4;
                 player.style.left = playerLeft + 'px';
             }
             if (checkPointCollision()) {
