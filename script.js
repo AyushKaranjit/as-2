@@ -402,6 +402,14 @@ function gameOver() {
 
 //===========================================================================================
 
+// LEADERBOARD
+
+const leaderboard = document.querySelector('.leaderboard');
+if (leaderboard) {
+    leaderboard.style.wordWrap = 'break-word';
+    leaderboard.style.wordBreak = 'break-all';
+}
+
 // Function to update the leaderboard
 function updateLeaderboard() {
     let scores = JSON.parse(localStorage.getItem('scores')) || [];
