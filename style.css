@@ -16,6 +16,7 @@ body {
     grid-template-areas: 
         "header header header"
         "lboard main score"
+        "lboard main level"
         "lboard main controls";
     align-items: center;
     justify-items: center;
@@ -232,6 +233,10 @@ button:nth-child(4) { grid-area: downArrow; }
     animation: hitAnimation 1.5s ease-in-out;
 }
 
+.level {
+    grid-area: level;
+}
+
 .restartDiv {
     position: absolute;
     display: flex;
@@ -252,6 +257,32 @@ button:nth-child(4) { grid-area: downArrow; }
 }
 
 .restartDiv h1 {
+    text-shadow: 2px 2px 2px #000;
+	font-size: 2em;
+    text-decoration: none;
+    margin-left: 10px;
+}
+
+.nextDiv {
+    position: absolute;
+    display: flex;
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+}
+
+.nextDiv div {
+	background-color: #ccc;
+    z-index: 100;
+	cursor: pointer;
+	border-radius: 20px;
+	box-shadow: 4px 4px 4px #000;
+    padding: 20px 30px;
+    display: flex;
+    height: 32px;
+}
+
+.nextDiv h1 {
     text-shadow: 2px 2px 2px #000;
 	font-size: 2em;
     text-decoration: none;
