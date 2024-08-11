@@ -1,4 +1,3 @@
-// IMPORTANT the local storage has a limited amount of storage capacity, so after the capacity has been exceeded, the local storage will be full and the game will not be able to save any more scores and the game will not work. To fix this, you can clear the local storage by running localStorage.clear() in the console.
 
 // START BUTTON
 
@@ -248,6 +247,8 @@ setInterval(moveEnemies, 100);
 // Initialize player and player mouth elements
 const player = document.querySelector('#player');
 const playerMouth = player.querySelector('.mouth');
+player.style.width = '70%';
+player.style.height = '70%';
 let playerTop = 0;
 let playerLeft = 0;
 let isMoving = true;
