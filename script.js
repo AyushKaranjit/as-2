@@ -41,7 +41,7 @@ let rightPressed = false;
 
 const main = document.querySelector("main");
 
-// Maze layout: 1 = Wall, 2 = Player, 0 = Point, 3 = enemy, 4 = solvablePath
+// Maze layout: 1 = Wall, 2 = Player, 3 = Enemy, 0 = Point
 let maze = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   [1, 2, 4, 1, 0, 0, 0, 4, 0, 1],
@@ -88,34 +88,37 @@ for (let i = 0; i < 3; i++) {
 }
 
 // Populates the maze in the HTML based on the maze array
-for (let y of maze) {
-  for (let x of y) {
-    let block = document.createElement("div");
-    block.classList.add("block");
+function generateMaze() {
+  for (let y of maze) {
+    for (let x of y) {
+      let block = document.createElement("div");
+      block.classList.add("block");
 
-    switch (x) {
-      case 1:
-        block.classList.add("wall");
-        break;
-      case 2:
-        block.id = "player";
-        let mouth = document.createElement("div");
-        mouth.classList.add("mouth");
-        block.appendChild(mouth);
-        break;
-      case 3:
-        block.classList.add("enemy");
-        break;
-      default:
-        block.classList.add("point");
-        block.style.height = "1vh";
-        block.style.width = "1vh";
+      switch (x) {
+        case 1:
+          block.classList.add("wall");
+          break;
+        case 2:
+          block.id = "player";
+          let mouth = document.createElement("div");
+          mouth.classList.add("mouth");
+          block.appendChild(mouth);
+          break;
+        case 3:
+          block.classList.add("enemy");
+          break;
+        default:
+          block.classList.add("point");
+          block.style.height = "1vh";
+          block.style.width = "1vh";
+      }
+
+      main.appendChild(block);
     }
-
-    main.appendChild(block);
   }
 }
 
+generateMaze();
 // ===========================================================================================
 
 // EVENT HANDLERS TO TRACK KEY PRESS STATES
