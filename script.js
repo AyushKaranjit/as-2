@@ -356,21 +356,32 @@ function checkPointCollision() {
   const points = document.querySelectorAll(".point");
 
   if (points.length === 0) {
-    gameStarted = false;
-    setTimeout(() => {
-      const playerName = prompt(
-        "🎉🥳 Congratulations!! 🎉🥳 Your total score was " +
-          score +
-          ". Please enter your name:"
-      );
+    main.innerHTML = "";
+    randomizedMaze();
+    generateMaze();
+    const player = document.querySelector("#player");
+    const playerMouth = player.querySelector(".mouth");
+    player.style.width = "75%";
+    player.style.height = "75%";
+    let playerTop = 0;
+    let playerLeft = 0;
+    let isMoving = true;
+    setInterval(movePlayer, 10);
+    // gameStarted = false;
+    // setTimeout(() => {
+    //   const playerName = prompt(
+    //     "🎉🥳 Congratulations!! 🎉🥳 Your total score was " +
+    //       score +
+    //       ". Please enter your name:"
+    //   );
 
-      // Save the player's name and score to local storage
-      let scores = JSON.parse(localStorage.getItem("scores")) || [];
-      scores.push({ name: playerName, score: score });
-      localStorage.setItem("scores", JSON.stringify(scores));
-      updateLeaderboard();
-      restartBtn.style.display = "flex";
-    }, 100);
+    //   // Save the player's name and score to local storage
+    //   let scores = JSON.parse(localStorage.getItem("scores")) || [];
+    //   scores.push({ name: playerName, score: score });
+    //   localStorage.setItem("scores", JSON.stringify(scores));
+    //   updateLeaderboard();
+    //   restartBtn.style.display = "flex";
+    // }, 100);
   }
 
   for (let point of points) {
