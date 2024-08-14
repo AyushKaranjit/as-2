@@ -8,7 +8,6 @@ function startGame() {
   gameStarted = true;
   restartBtn.style.display = "none";
   startBtn.style.display = "none";
-  console.log("Game started");
 }
 
 // ===========================================================================================
@@ -40,9 +39,7 @@ let leftPressed = false;
 let rightPressed = false;
 
 const main = document.querySelector("main");
-const originalContent = main.innerHTML;
 
-console.log(main);
 // Maze layout: 1 = Wall, 2 = Player, 3 = Enemy, 0 = Point
 let maze = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -128,32 +125,24 @@ generateMaze();
 function keyUp(event) {
   if (event.key === "ArrowUp") {
     upPressed = false;
-    console.log("ArrowUp released");
   } else if (event.key === "ArrowDown") {
     downPressed = false;
-    console.log("ArrowDown released");
   } else if (event.key === "ArrowLeft") {
     leftPressed = false;
-    console.log("ArrowLeft released");
   } else if (event.key === "ArrowRight") {
     rightPressed = false;
-    console.log("ArrowRight released");
   }
 }
 
 function keyDown(event) {
   if (event.key === "ArrowUp") {
     upPressed = true;
-    console.log("ArrowUp pressed");
   } else if (event.key === "ArrowDown") {
     downPressed = true;
-    console.log("ArrowDown pressed");
   } else if (event.key === "ArrowLeft") {
     leftPressed = true;
-    console.log("ArrowLeft pressed");
   } else if (event.key === "ArrowRight") {
     rightPressed = true;
-    console.log("ArrowRight pressed");
   }
 }
 
@@ -183,7 +172,6 @@ function checkWallCollisionForEnemy(enemy) {
       enemyRect.right > wallRect.left
     ) {
       // Collision detected with wall
-      console.log("Collision of enemy with wall detected");
       return true;
     }
   }
@@ -274,7 +262,6 @@ function movePlayer() {
         player.style.top = playerTop + "px";
       }
       if (checkPointCollision()) {
-        console.log("Point collected");
       }
     }
     // Move player up
@@ -288,7 +275,6 @@ function movePlayer() {
         player.style.top = playerTop + "px";
       }
       if (checkPointCollision()) {
-        console.log("Point collected");
       }
     }
     // Move player left
@@ -302,7 +288,6 @@ function movePlayer() {
         player.style.left = playerLeft + "px";
       }
       if (checkPointCollision()) {
-        console.log("Point collected");
       }
     }
     // Move player right
@@ -316,7 +301,6 @@ function movePlayer() {
         player.style.left = playerLeft + "px";
       }
       if (checkPointCollision()) {
-        console.log("Point collected");
       }
     }
   }
@@ -340,7 +324,6 @@ function checkWallCollisionForPlayer() {
       playerRect.right > wallRect.left
     ) {
       // Collision detected with wall
-      console.log("Collision of player with wall detected");
       return true;
     }
   }
@@ -416,7 +399,6 @@ function nextLevel() {
           player.style.top = playerTop + "px";
         }
         if (checkPointCollision()) {
-          console.log("Point collected");
         }
       }
       // Move player up
@@ -430,7 +412,6 @@ function nextLevel() {
           player.style.top = playerTop + "px";
         }
         if (checkPointCollision()) {
-          console.log("Point collected");
         }
       }
       // Move player left
@@ -444,7 +425,6 @@ function nextLevel() {
           player.style.left = playerLeft + "px";
         }
         if (checkPointCollision()) {
-          console.log("Point collected");
         }
       }
       // Move player right
@@ -458,7 +438,6 @@ function nextLevel() {
           player.style.left = playerLeft + "px";
         }
         if (checkPointCollision()) {
-          console.log("Point collected");
         }
       }
     }
@@ -480,7 +459,6 @@ function nextLevel() {
         playerRect.right > wallRect.left
       ) {
         // Collision detected with wall
-        console.log("Collision of player with wall detected");
         return true;
       }
     }
@@ -522,7 +500,6 @@ function nextLevel() {
         playerRect.right > pointRect.left
       ) {
         // Collision detected with point
-        console.log("Point collected");
         point.classList.remove("point");
         score += 10;
         document.querySelector(".score p").textContent = score;
@@ -629,7 +606,6 @@ function nextLevel() {
         if (!gameOverState && !collisionCooldown) {
           EnemyHit();
           lives--;
-          console.log(`Life lost! Lives remaining: ${lives}`);
 
           collisionCooldown = true;
           clearInterval(collisionInterval);
@@ -663,21 +639,6 @@ function checkPointCollision() {
 
   if (points.length === 0) {
     nextLevel();
-    // gameStarted = false;
-    // setTimeout(() => {
-    //   const playerName = prompt(
-    //     "🎉🥳 Congratulations!! 🎉🥳 Your total score was " +
-    //       score +
-    //       ". Please enter your name:"
-    //   );
-
-    //   // Save the player's name and score to local storage
-    //   let scores = JSON.parse(localStorage.getItem("scores")) || [];
-    //   scores.push({ name: playerName, score: score });
-    //   localStorage.setItem("scores", JSON.stringify(scores));
-    //   updateLeaderboard();
-    //   restartBtn.style.display = "flex";
-    // }, 100);
   }
 
   for (let point of points) {
@@ -689,8 +650,6 @@ function checkPointCollision() {
       playerRect.left < pointRect.right &&
       playerRect.right > pointRect.left
     ) {
-      // Collision detected with point
-      console.log("Point collected");
       point.classList.remove("point");
       score += 10;
       document.querySelector(".score p").textContent = score;
@@ -842,7 +801,6 @@ function checkEnemyCollision() {
       if (!gameOverState && !collisionCooldown) {
         EnemyHit();
         lives--;
-        console.log(`Life lost! Lives remaining: ${lives}`);
 
         collisionCooldown = true;
         clearInterval(collisionInterval);
