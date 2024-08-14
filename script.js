@@ -40,7 +40,9 @@ let leftPressed = false;
 let rightPressed = false;
 
 const main = document.querySelector("main");
+const originalContent = main.innerHTML;
 
+console.log(main);
 // Maze layout: 1 = Wall, 2 = Player, 3 = Enemy, 0 = Point
 let maze = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -347,26 +349,320 @@ function checkWallCollisionForPlayer() {
   return false;
 }
 
+// ===========================================================================================
+
+// NEXT LEVEL
+
+let level = 1;
+
+function nextLevel() {
+  main.innerHTML = "";
+  maze = [
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 2, 4, 1, 0, 0, 0, 4, 0, 1],
+    [1, 0, 4, 0, 4, 4, 4, 4, 4, 1],
+    [1, 0, 4, 4, 0, 0, 4, 4, 4, 1],
+    [1, 0, 4, 1, 0, 0, 4, 4, 4, 1],
+    [1, 0, 4, 0, 4, 4, 0, 1, 1, 1],
+    [1, 0, 4, 1, 0, 4, 4, 4, 0, 1],
+    [1, 4, 0, 0, 4, 0, 4, 4, 0, 1],
+    [1, 4, 4, 4, 0, 0, 0, 4, 0, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  ];
+
+  for (let i = 0; i < 5; i++) {
+    randomizedMaze();
+  }
+
+  function randomizedEnemy() {
+    let row = Math.floor(Math.random() * maze.length);
+    let column = Math.floor(Math.random() * maze[row].length);
+
+    if (maze[row][column] == 0) {
+      maze[row][column] = 3;
+    } else {
+      randomizedEnemy();
+    }
+  }
+
+  for (let i = 0; i < 3; i++) {
+    randomizedEnemy();
+  }
+
+  generateMaze(maze);
+
+  level++;
+  document.querySelector(".level p").textContent = level;
+
+  const player = document.querySelector("#player");
+  const playerMouth = player.querySelector(".mouth");
+  player.style.width = "75%";
+  player.style.height = "75%";
+  let playerTop = 0;
+  let playerLeft = 0;
+  let isMoving = true;
+
+  // Function to move the player based on key presses
+  function movePlayer() {
+    if (gameStarted && isMoving) {
+      // Move player down
+      if (downPressed) {
+        playerTop = playerTop + 2;
+        player.style.top = playerTop + "px";
+        playerMouth.classList = "down";
+
+        if (checkWallCollisionForPlayer()) {
+          playerTop = playerTop - 2;
+          player.style.top = playerTop + "px";
+        }
+        if (checkPointCollision()) {
+          console.log("Point collected");
+        }
+      }
+      // Move player up
+      else if (upPressed) {
+        playerTop = playerTop - 2;
+        player.style.top = playerTop + "px";
+        playerMouth.classList = "up";
+
+        if (checkWallCollisionForPlayer()) {
+          playerTop = playerTop + 2;
+          player.style.top = playerTop + "px";
+        }
+        if (checkPointCollision()) {
+          console.log("Point collected");
+        }
+      }
+      // Move player left
+      else if (leftPressed) {
+        playerLeft = playerLeft - 2;
+        player.style.left = playerLeft + "px";
+        playerMouth.classList = "left";
+
+        if (checkWallCollisionForPlayer()) {
+          playerLeft = playerLeft + 2;
+          player.style.left = playerLeft + "px";
+        }
+        if (checkPointCollision()) {
+          console.log("Point collected");
+        }
+      }
+      // Move player right
+      else if (rightPressed) {
+        playerLeft = playerLeft + 2;
+        player.style.left = playerLeft + "px";
+        playerMouth.classList = "right";
+
+        if (checkWallCollisionForPlayer()) {
+          playerLeft = playerLeft - 2;
+          player.style.left = playerLeft + "px";
+        }
+        if (checkPointCollision()) {
+          console.log("Point collected");
+        }
+      }
+    }
+  }
+  // Periodically call movePlayer to update player position
+  setInterval(movePlayer, 10);
+
+  function checkWallCollisionForPlayer() {
+    const playerRect = player.getBoundingClientRect();
+    const walls = document.querySelectorAll(".wall");
+
+    for (let wall of walls) {
+      const wallRect = wall.getBoundingClientRect();
+
+      if (
+        playerRect.top < wallRect.bottom &&
+        playerRect.bottom > wallRect.top &&
+        playerRect.left < wallRect.right &&
+        playerRect.right > wallRect.left
+      ) {
+        // Collision detected with wall
+        console.log("Collision of player with wall detected");
+        return true;
+      }
+    }
+
+    // No collision with walls
+    return false;
+  }
+
+  function checkPointCollision() {
+    const playerRect = player.getBoundingClientRect();
+    const points = document.querySelectorAll(".point");
+
+    if (points.length === 0) {
+      nextLevel();
+      // gameStarted = false;
+      // setTimeout(() => {
+      //   const playerName = prompt(
+      //     "🎉🥳 Congratulations!! 🎉🥳 Your total score was " +
+      //       score +
+      //       ". Please enter your name:"
+      //   );
+
+      //   // Save the player's name and score to local storage
+      //   let scores = JSON.parse(localStorage.getItem("scores")) || [];
+      //   scores.push({ name: playerName, score: score });
+      //   localStorage.setItem("scores", JSON.stringify(scores));
+      //   updateLeaderboard();
+      //   restartBtn.style.display = "flex";
+      // }, 100);
+    }
+
+    for (let point of points) {
+      const pointRect = point.getBoundingClientRect();
+
+      if (
+        playerRect.top < pointRect.bottom &&
+        playerRect.bottom > pointRect.top &&
+        playerRect.left < pointRect.right &&
+        playerRect.right > pointRect.left
+      ) {
+        // Collision detected with point
+        console.log("Point collected");
+        point.classList.remove("point");
+        score += 10;
+        document.querySelector(".score p").textContent = score;
+      }
+    }
+  }
+
+  function gameOver() {
+    gameStarted = false;
+    player.classList.add("dead");
+    setTimeout(() => {
+      const playerName = prompt(
+        "Game Over. Your total score was " + score + ". Please enter your name:"
+      );
+
+      // Save the player's name and score to local storage
+      let scores = JSON.parse(localStorage.getItem("scores")) || [];
+      scores.push({ name: playerName, score: score });
+      localStorage.setItem("scores", JSON.stringify(scores));
+
+      updateLeaderboard();
+      restartBtn.style.display = "flex";
+    }, 3000);
+  }
+
+  const leaderboard = document.querySelector(".leaderboard");
+  if (leaderboard) {
+    leaderboard.style.wordWrap = "break-word";
+    leaderboard.style.wordBreak = "break-all";
+  }
+
+  // Function to update the leaderboard
+  function updateLeaderboard() {
+    let scores = JSON.parse(localStorage.getItem("scores")) || [];
+
+    // Ensure all scores have a valid name
+    scores.forEach((score) => {
+      if (!score.name) {
+        score.name = "Anonymous";
+      }
+    });
+
+    // Sort scores first by score in descending order, then by name in ascending order
+    scores.sort((a, b) => {
+      if (b.score === a.score) {
+        return a.name.localeCompare(b.name);
+      }
+      return b.score - a.score;
+    });
+
+    // Get the top 5 scores
+    let topScores = scores.slice(0, 5);
+
+    // Display the top 5 scores in the .leaderboard div
+    const leaderboard = document.querySelector(".leaderboard");
+    leaderboard.innerHTML =
+      '<h2>Leaderboard</h2><ol style="font-size: 1.5em;"></ol>';
+    const ol = leaderboard.querySelector("ol");
+    topScores.forEach((score) => {
+      ol.innerHTML += `<li>${score.name}: ${score.score}</li>`;
+    });
+  }
+
+  // Call updateLeaderboard to display the leaderboard
+  updateLeaderboard();
+
+  function removeLife() {
+    const livesUL = document.querySelector(".lives ul");
+    if (livesUL.children.length > 0) {
+      livesUL.removeChild(livesUL.children[0]);
+    }
+  }
+
+  function EnemyHit() {
+    player.classList.add("hit");
+    isMoving = false;
+    removeLife();
+    setTimeout(() => {
+      player.classList.remove("hit");
+      isMoving = true;
+      if (lives == 0) {
+        isMoving = false;
+      }
+    }, 1500);
+  }
+
+  let gameOverState = false;
+  let collisionCooldown = false;
+  let collisionInterval = setInterval(checkEnemyCollision, 100);
+
+  function checkEnemyCollision() {
+    const playerRect = player.getBoundingClientRect();
+    const enemies = document.querySelectorAll(".enemy");
+
+    for (let enemy of enemies) {
+      const enemyRect = enemy.getBoundingClientRect();
+
+      if (
+        playerRect.top < enemyRect.bottom &&
+        playerRect.bottom > enemyRect.top &&
+        playerRect.left < enemyRect.right &&
+        playerRect.right > enemyRect.left
+      ) {
+        if (!gameOverState && !collisionCooldown) {
+          EnemyHit();
+          lives--;
+          console.log(`Life lost! Lives remaining: ${lives}`);
+
+          collisionCooldown = true;
+          clearInterval(collisionInterval);
+          collisionInterval = setInterval(checkEnemyCollision, 1500);
+
+          setTimeout(() => {
+            collisionCooldown = false;
+            clearInterval(collisionInterval);
+            collisionInterval = setInterval(checkEnemyCollision, 100);
+          }, 1500);
+
+          if (lives == 0) {
+            gameOverState = true;
+            gameOver();
+          }
+        }
+      }
+    }
+  }
+
+  setInterval(checkEnemyCollision, 100);
+}
+// ===========================================================================================
+
 // Points Detection
 let score = 0;
-let maxScore = document.querySelectorAll(".point").length;
 
 function checkPointCollision() {
   const playerRect = player.getBoundingClientRect();
   const points = document.querySelectorAll(".point");
 
   if (points.length === 0) {
-    main.innerHTML = "";
-    randomizedMaze();
-    generateMaze();
-    const player = document.querySelector("#player");
-    const playerMouth = player.querySelector(".mouth");
-    player.style.width = "75%";
-    player.style.height = "75%";
-    let playerTop = 0;
-    let playerLeft = 0;
-    let isMoving = true;
-    setInterval(movePlayer, 10);
+    nextLevel();
     // gameStarted = false;
     // setTimeout(() => {
     //   const playerName = prompt(
