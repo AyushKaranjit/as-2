@@ -18,7 +18,9 @@ body {
     "lboard main score"
     "lboard main level"
     "lboard main time"
-    "lboard main controls";
+    "lboard main clear"
+    "lboard main controls"
+    "footer footer footer";
   align-items: center;
   justify-items: center;
 }
@@ -94,6 +96,7 @@ main {
 
 .score {
   grid-area: score;
+  font-size: 0.7em;
 }
 
 .leaderboard {
@@ -258,12 +261,22 @@ button:nth-child(4) {
 
 .level {
   grid-area: level;
+  font-size: 0.7em;
 }
 
 .time {
   grid-area: time;
+  font-size: 0.7em;
 }
 
+.clear {
+  grid-area: clear;
+}
+
+#clear {
+  padding: 10px;
+  line-height: 1.5;
+}
 
 .restartDiv {
   position: absolute;
@@ -289,4 +302,10 @@ button:nth-child(4) {
   font-size: 2em;
   text-decoration: none;
   margin-left: 10px;
+}
+
+footer {
+  grid-area: footer;
+  text-align: center;
+  font-size: 0.8em;
 }

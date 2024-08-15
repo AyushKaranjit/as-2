@@ -42,6 +42,8 @@ let downPressed = false;
 let leftPressed = false;
 let rightPressed = false;
 
+const clearBtn = document.getElementById("clear");
+
 const main = document.querySelector("main");
 
 // Maze layout: 1 = Wall, 2 = Player, 3 = Enemy, 0 = Point
@@ -497,14 +499,14 @@ function nextLevel() {
   function checkPointCollision() {
     const playerRect = player.getBoundingClientRect();
     const points = document.querySelectorAll(".point");
-  
+
     if (points.length === 0) {
       nextLevel();
     }
-  
+
     for (let point of points) {
       const pointRect = point.getBoundingClientRect();
-  
+
       if (
         playerRect.top < pointRect.bottom &&
         playerRect.bottom > pointRect.top &&
@@ -517,7 +519,6 @@ function nextLevel() {
       }
     }
   }
-  
 
   function stopTimer() {
     clearInterval(timerInterval);
@@ -584,10 +585,10 @@ function nextLevel() {
   function updateLeaderboard() {
     const leaderboard = document.querySelector(".leaderboard ol");
     if (!leaderboard) return;
-  
+
     // Retrieve scores from local storage
     let scores = JSON.parse(localStorage.getItem("scores")) || [];
-  
+
     // Sort scores first by score in descending order, then by time in ascending order
     scores.sort((a, b) => {
       if (b.score === a.score) {
@@ -595,10 +596,10 @@ function nextLevel() {
       }
       return b.score - a.score;
     });
-  
+
     // Clear the current leaderboard
     leaderboard.innerHTML = "";
-  
+
     // Populate the leaderboard with the sorted scores
     scores.forEach((entry) => {
       const li = document.createElement("li");
@@ -723,9 +724,14 @@ function gameOver() {
   const timePlayed = time; // Store the time played
   const currentLevel = level; // Store the current level
   setTimeout(() => {
-    const playerName = prompt(
-      "Game Over. Your total score was " + score + ". Please enter your name:"
+    let playerName = prompt(
+      "                    Game Over\nEnter your name below:\n(Ps: Enter the same name if you want to update your previous score or click cancel to remain anonymous) "
     );
+
+    // Set playerName to "Anonymous" if the prompt is cancelled or empty
+    if (!playerName) {
+      playerName = "Anonymous";
+    }
 
     // Retrieve scores from local storage
     let scores = JSON.parse(localStorage.getItem("scores")) || [];
@@ -921,6 +927,16 @@ document.addEventListener("keyup", keyUp);
 
 startBtn.addEventListener("click", startGame);
 restartBtn.addEventListener("click", restartGame);
+
+clearBtn.addEventListener("click", function () {
+  const confirmation = confirm(
+    "Are you sure you want to clear the leaderboard?"
+  );
+  if (confirmation) {
+    localStorage.removeItem("scores");
+    updateLeaderboard();
+  }
+});
 
 // Function to handle button events
 const handleButtonEvent = (event, direction, isPressed) => {
