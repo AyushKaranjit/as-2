@@ -3,8 +3,8 @@
 let gameStarted = false;
 const startBtn = document.querySelector(".start");
 let timerInterval;
-const introSound = new Audio("audio/intro.mp3");
-const wakawakaSound = new Audio("audio/wakawaka.wav");
+const introSound = new Audio("assets/audio/intro.mp3");
+const wakawakaSound = new Audio("assets/audio/wakawaka.wav");
 wakawakaSound.loop = true; // Loop the sound
 
 // MUTE BUTTON
@@ -911,8 +911,8 @@ function removeLife() {
 
 // Function to handle the hit animation and disable movement
 // Create a new Audio object for hit.mp3
-const hitSound = new Audio("audio/hit.mp3");
-const deathSound = new Audio("audio/death.wav");
+const hitSound = new Audio("assets/audio/hit.mp3");
+const deathSound = new Audio("assets/audio/death.wav");
 // Function to handle the hit animation and disable movement
 function EnemyHit() {
   player.classList.add("hit");
