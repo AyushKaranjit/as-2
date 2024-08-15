@@ -18,6 +18,7 @@ body {
     "lboard main score"
     "lboard main level"
     "lboard main time"
+    "lboard main mute"
     "lboard main clear"
     "lboard main controls"
     "footer footer footer";
@@ -271,6 +272,16 @@ button:nth-child(4) {
 
 .clear {
   grid-area: clear;
+}
+
+.mute {
+  grid-area: mute;
+}
+
+#mute {
+  padding: 10px;
+  padding-left: 50px;
+  padding-right: 50px;
 }
 
 #clear {

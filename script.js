@@ -3,15 +3,43 @@
 let gameStarted = false;
 const startBtn = document.querySelector(".start");
 let timerInterval;
+const introSound = new Audio("audio/intro.mp3");
+const wakawakaSound = new Audio("audio/wakawaka.wav");
+wakawakaSound.loop = true; // Loop the sound
+
+// MUTE BUTTON
+const muteBtn = document.getElementById("mute");
+let isMuted = false;
+
+muteBtn.addEventListener("click", () => {
+  isMuted = !isMuted;
+  if (isMuted) {
+    introSound.muted = true;
+    wakawakaSound.muted = true;
+    hitSound.muted = true;
+    deathSound.muted = true;
+    muteBtn.textContent = "Unmute";
+  } else {
+    introSound.muted = false;
+    wakawakaSound.muted = false;
+    hitSound.muted = false;
+    deathSound.muted = false;
+    muteBtn.textContent = "Mute";
+  }
+});
 
 // Function to start the game
 function startGame() {
   gameStarted = true;
   restartBtn.style.display = "none";
   startBtn.style.display = "none";
-  startTime = new Date();
-  console.log("Game started at: " + startTime);
-  timerInterval = setInterval(timeplayed, 1000);
+  introSound.play();
+  setTimeout(() => {
+    wakawakaSound.play();
+  },4500);
+  setTimeout(() => {
+    timerInterval = setInterval(timeplayed, 1000);
+  }, 4000);
 }
 
 // ===========================================================================================
@@ -239,7 +267,9 @@ function moveEnemies() {
 }
 
 // Periodically call moveEnemies to update enemy positions
-setInterval(moveEnemies, 100);
+setTimeout(() => {
+  setInterval(moveEnemies, 100);
+}, 5000);
 
 // ===========================================================================================
 
@@ -313,7 +343,9 @@ function movePlayer() {
 }
 
 // Periodically call movePlayer to update player position
-setInterval(movePlayer, 10);
+setTimeout(() => {
+  setInterval(movePlayer, 10);
+}, 5000);
 
 // Collision detection with walls for players
 function checkWallCollisionForPlayer() {
@@ -629,15 +661,31 @@ function nextLevel() {
 
   function EnemyHit() {
     player.classList.add("hit");
+    wakawakaSound.pause();
+    wakawakaSound.currentTime = 0;
     isMoving = false;
     removeLife();
+  
+    // Play hit.mp3
+    hitSound.play();
+  
     setTimeout(() => {
+      // Stop hit.mp3 after 2 seconds
+      hitSound.pause();
+      hitSound.currentTime = 0;
+  
+      // Resume wakawaka.wav
+      wakawakaSound.play();
       player.classList.remove("hit");
       isMoving = true;
       if (lives == 0) {
         isMoving = false;
+        wakawakaSound.pause();
+        wakawakaSound.currentTime = 0
+        deathSound.play();
+  
       }
-    }, 1500);
+    }, 2000);
   }
 
   let gameOverState = false;
@@ -722,6 +770,7 @@ function gameOver() {
   stopTimer();
   gameStarted = false;
   player.classList.add("dead");
+
   const timePlayed = time; // Store the time played
   const currentLevel = level; // Store the current level
   setTimeout(() => {
@@ -861,19 +910,38 @@ function removeLife() {
 // ENEMY COLLISION
 
 // Function to handle the hit animation and disable movement
+// Create a new Audio object for hit.mp3
+const hitSound = new Audio("audio/hit.mp3");
+const deathSound = new Audio("audio/death.wav");
+// Function to handle the hit animation and disable movement
 function EnemyHit() {
   player.classList.add("hit");
+  wakawakaSound.pause();
+  wakawakaSound.currentTime = 0;
   isMoving = false;
   removeLife();
+
+  // Play hit.mp3
+  hitSound.play();
+
   setTimeout(() => {
+    // Stop hit.mp3 after 2 seconds
+    hitSound.pause();
+    hitSound.currentTime = 0;
+
+    // Resume wakawaka.wav
+    wakawakaSound.play();
     player.classList.remove("hit");
     isMoving = true;
     if (lives == 0) {
       isMoving = false;
-    }
-  }, 1500);
-}
+      wakawakaSound.pause();
+      wakawakaSound.currentTime = 0
+      deathSound.play();
 
+    }
+  }, 2000);
+}
 // Function to check for enemy collisions
 let gameOverState = false;
 let collisionCooldown = false;
@@ -898,13 +966,13 @@ function checkEnemyCollision() {
 
         collisionCooldown = true;
         clearInterval(collisionInterval);
-        collisionInterval = setInterval(checkEnemyCollision, 1500);
+        collisionInterval = setInterval(checkEnemyCollision, 2000);
 
         setTimeout(() => {
           collisionCooldown = false;
           clearInterval(collisionInterval);
           collisionInterval = setInterval(checkEnemyCollision, 100);
-        }, 1500);
+        }, 2000);
 
         if (lives == 0) {
           gameOverState = true;
