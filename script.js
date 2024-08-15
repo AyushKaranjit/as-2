@@ -2,12 +2,16 @@
 
 let gameStarted = false;
 const startBtn = document.querySelector(".start");
+let timerInterval;
 
 // Function to start the game
 function startGame() {
   gameStarted = true;
   restartBtn.style.display = "none";
   startBtn.style.display = "none";
+  startTime = new Date();
+  console.log("Game started at: " + startTime);
+  timerInterval = setInterval(timeplayed, 1000);
 }
 
 // ===========================================================================================
@@ -333,6 +337,29 @@ function checkWallCollisionForPlayer() {
 }
 
 // ===========================================================================================
+// TIME PLAYED
+let time = 0;
+
+function timeplayed() {
+  time++;
+  document.querySelector(".time p").textContent = formatTime(time);
+}
+
+function formatTime(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes < 10 ? "0" : ""}${minutes}:${
+    remainingSeconds < 10 ? "0" : ""
+  }${remainingSeconds}`;
+}
+
+function formatTimeForLeaderboard(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}m ${remainingSeconds}s`;
+}
+
+// ===========================================================================================
 
 // NEXT LEVEL
 
@@ -470,54 +497,76 @@ function nextLevel() {
   function checkPointCollision() {
     const playerRect = player.getBoundingClientRect();
     const points = document.querySelectorAll(".point");
-
+  
     if (points.length === 0) {
       nextLevel();
-      // gameStarted = false;
-      // setTimeout(() => {
-      //   const playerName = prompt(
-      //     "🎉🥳 Congratulations!! 🎉🥳 Your total score was " +
-      //       score +
-      //       ". Please enter your name:"
-      //   );
-
-      //   // Save the player's name and score to local storage
-      //   let scores = JSON.parse(localStorage.getItem("scores")) || [];
-      //   scores.push({ name: playerName, score: score });
-      //   localStorage.setItem("scores", JSON.stringify(scores));
-      //   updateLeaderboard();
-      //   restartBtn.style.display = "flex";
-      // }, 100);
     }
-
+  
     for (let point of points) {
       const pointRect = point.getBoundingClientRect();
-
+  
       if (
         playerRect.top < pointRect.bottom &&
         playerRect.bottom > pointRect.top &&
         playerRect.left < pointRect.right &&
         playerRect.right > pointRect.left
       ) {
-        // Collision detected with point
         point.classList.remove("point");
         score += 10;
         document.querySelector(".score p").textContent = score;
       }
     }
   }
+  
+
+  function stopTimer() {
+    clearInterval(timerInterval);
+  }
+
+  function formatTimeForLeaderboard(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}m ${remainingSeconds}s`;
+  }
 
   function gameOver() {
+    stopTimer();
     gameStarted = false;
     player.classList.add("dead");
+    const timePlayed = time; // Store the time played
+    const currentLevel = level; // Store the current level
     setTimeout(() => {
       const playerName = prompt(
         "Game Over. Your total score was " + score + ". Please enter your name:"
       );
 
-      // Save the player's name and score to local storage
+      // Retrieve scores from local storage
       let scores = JSON.parse(localStorage.getItem("scores")) || [];
-      scores.push({ name: playerName, score: score });
+
+      // Check if the player name already exists
+      const existingPlayerIndex = scores.findIndex(
+        (entry) => entry.name === playerName
+      );
+
+      if (existingPlayerIndex !== -1) {
+        // Replace the old data with the new data
+        scores[existingPlayerIndex] = {
+          name: playerName,
+          score: score,
+          time: timePlayed,
+          level: currentLevel,
+        };
+      } else {
+        // Add new data
+        scores.push({
+          name: playerName,
+          score: score,
+          time: timePlayed,
+          level: currentLevel,
+        });
+      }
+
+      // Save the updated scores to local storage
       localStorage.setItem("scores", JSON.stringify(scores));
 
       updateLeaderboard();
@@ -533,33 +582,36 @@ function nextLevel() {
 
   // Function to update the leaderboard
   function updateLeaderboard() {
+    const leaderboard = document.querySelector(".leaderboard ol");
+    if (!leaderboard) return;
+  
+    // Retrieve scores from local storage
     let scores = JSON.parse(localStorage.getItem("scores")) || [];
-
-    // Ensure all scores have a valid name
-    scores.forEach((score) => {
-      if (!score.name) {
-        score.name = "Anonymous";
-      }
-    });
-
-    // Sort scores first by score in descending order, then by name in ascending order
+  
+    // Sort scores first by score in descending order, then by time in ascending order
     scores.sort((a, b) => {
       if (b.score === a.score) {
-        return a.name.localeCompare(b.name);
+        return a.time - b.time; // Less time is better
       }
       return b.score - a.score;
     });
-
-    // Get the top 5 scores
-    let topScores = scores.slice(0, 5);
-
-    // Display the top 5 scores in the .leaderboard div
-    const leaderboard = document.querySelector(".leaderboard");
-    leaderboard.innerHTML =
-      '<h2>Leaderboard</h2><ol style="font-size: 1.5em;"></ol>';
-    const ol = leaderboard.querySelector("ol");
-    topScores.forEach((score) => {
-      ol.innerHTML += `<li>${score.name}: ${score.score}</li>`;
+  
+    // Clear the current leaderboard
+    leaderboard.innerHTML = "";
+  
+    // Populate the leaderboard with the sorted scores
+    scores.forEach((entry) => {
+      const li = document.createElement("li");
+      li.innerHTML = `${
+        entry.name
+      }<br><p style="font-size: 1em; margin-top: 0.5em; margin-left: 0em;">Score: ${
+        entry.score
+      }<br><p style="font-size: 1em; margin-top: 0.5em; margin-left: 0em;"> Level: ${
+        entry.level
+      }<br> <p style="font-size: 1em; margin-top: 0.5em; margin-left: 0em;">Time : ${formatTimeForLeaderboard(
+        entry.time
+      )}</p>`;
+      leaderboard.appendChild(li);
     });
   }
 
@@ -660,17 +712,48 @@ function checkPointCollision() {
 //===========================================================================================
 
 // GAME OVER
+function stopTimer() {
+  clearInterval(timerInterval);
+}
+
 function gameOver() {
+  stopTimer();
   gameStarted = false;
   player.classList.add("dead");
+  const timePlayed = time; // Store the time played
+  const currentLevel = level; // Store the current level
   setTimeout(() => {
     const playerName = prompt(
       "Game Over. Your total score was " + score + ". Please enter your name:"
     );
 
-    // Save the player's name and score to local storage
+    // Retrieve scores from local storage
     let scores = JSON.parse(localStorage.getItem("scores")) || [];
-    scores.push({ name: playerName, score: score });
+
+    // Check if the player name already exists
+    const existingPlayerIndex = scores.findIndex(
+      (entry) => entry.name === playerName
+    );
+
+    if (existingPlayerIndex !== -1) {
+      // Replace the old data with the new data
+      scores[existingPlayerIndex] = {
+        name: playerName,
+        score: score,
+        time: timePlayed,
+        level: currentLevel,
+      };
+    } else {
+      // Add new data
+      scores.push({
+        name: playerName,
+        score: score,
+        time: timePlayed,
+        level: currentLevel,
+      });
+    }
+
+    // Save the updated scores to local storage
     localStorage.setItem("scores", JSON.stringify(scores));
 
     updateLeaderboard();
@@ -689,34 +772,38 @@ if (leaderboard) {
 }
 
 // Function to update the leaderboard
+// Function to update the leaderboard
 function updateLeaderboard() {
+  const leaderboard = document.querySelector(".leaderboard ol");
+  if (!leaderboard) return;
+
+  // Retrieve scores from local storage
   let scores = JSON.parse(localStorage.getItem("scores")) || [];
 
-  // Ensure all scores have a valid name
-  scores.forEach((score) => {
-    if (!score.name) {
-      score.name = "Anonymous";
-    }
-  });
-
-  // Sort scores first by score in descending order, then by name in ascending order
+  // Sort scores first by score in descending order, then by time in ascending order
   scores.sort((a, b) => {
     if (b.score === a.score) {
-      return a.name.localeCompare(b.name);
+      return a.time - b.time; // Less time is better
     }
     return b.score - a.score;
   });
 
-  // Get the top 5 scores
-  let topScores = scores.slice(0, 5);
+  // Clear the current leaderboard
+  leaderboard.innerHTML = "";
 
-  // Display the top 5 scores in the .leaderboard div
-  const leaderboard = document.querySelector(".leaderboard");
-  leaderboard.innerHTML =
-    '<h2>Leaderboard</h2><ol style="font-size: 1.5em;"></ol>';
-  const ol = leaderboard.querySelector("ol");
-  topScores.forEach((score) => {
-    ol.innerHTML += `<li>${score.name}: ${score.score}</li>`;
+  // Populate the leaderboard with the sorted scores
+  scores.forEach((entry) => {
+    const li = document.createElement("li");
+    li.innerHTML = `${
+      entry.name
+    }<br><p style="font-size: 1em; margin-top: 0.5em; margin-left: 0em;">Score: ${
+      entry.score
+    }<br><p style="font-size: 1em; margin-top: 0.5em; margin-left: 0em;"> Level: ${
+      entry.level
+    }<br> <p style="font-size: 1em; margin-top: 0.5em; margin-left: 0em;">Time : ${formatTimeForLeaderboard(
+      entry.time
+    )}</p>`;
+    leaderboard.appendChild(li);
   });
 }
 

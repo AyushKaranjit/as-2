@@ -17,6 +17,7 @@ body {
     "header header header"
     "lboard main score"
     "lboard main level"
+    "lboard main time"
     "lboard main controls";
   align-items: center;
   justify-items: center;
@@ -258,6 +259,11 @@ button:nth-child(4) {
 .level {
   grid-area: level;
 }
+
+.time {
+  grid-area: time;
+}
+
 
 .restartDiv {
   position: absolute;
