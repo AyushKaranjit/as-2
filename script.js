@@ -267,8 +267,8 @@ function movePlayer() {
         playerTop = playerTop - 2;
         player.style.top = playerTop + "px";
       }
-      if (checkPointCollision()) {
-      }
+
+      checkPointCollision();
     }
     // Move player up
     else if (upPressed) {
@@ -280,8 +280,8 @@ function movePlayer() {
         playerTop = playerTop + 2;
         player.style.top = playerTop + "px";
       }
-      if (checkPointCollision()) {
-      }
+
+      checkPointCollision();
     }
     // Move player left
     else if (leftPressed) {
@@ -293,8 +293,8 @@ function movePlayer() {
         playerLeft = playerLeft + 2;
         player.style.left = playerLeft + "px";
       }
-      if (checkPointCollision()) {
-      }
+
+      checkPointCollision();
     }
     // Move player right
     else if (rightPressed) {
@@ -306,8 +306,8 @@ function movePlayer() {
         playerLeft = playerLeft - 2;
         player.style.left = playerLeft + "px";
       }
-      if (checkPointCollision()) {
-      }
+
+      checkPointCollision();
     }
   }
 }
@@ -427,8 +427,7 @@ function nextLevel() {
           playerTop = playerTop - 2;
           player.style.top = playerTop + "px";
         }
-        if (checkPointCollision()) {
-        }
+        checkPointCollision();
       }
       // Move player up
       else if (upPressed) {
@@ -440,8 +439,7 @@ function nextLevel() {
           playerTop = playerTop + 2;
           player.style.top = playerTop + "px";
         }
-        if (checkPointCollision()) {
-        }
+        checkPointCollision();
       }
       // Move player left
       else if (leftPressed) {
@@ -453,8 +451,7 @@ function nextLevel() {
           playerLeft = playerLeft + 2;
           player.style.left = playerLeft + "px";
         }
-        if (checkPointCollision()) {
-        }
+        checkPointCollision();
       }
       // Move player right
       else if (rightPressed) {
@@ -466,8 +463,7 @@ function nextLevel() {
           playerLeft = playerLeft - 2;
           player.style.left = playerLeft + "px";
         }
-        if (checkPointCollision()) {
-        }
+        checkPointCollision();
       }
     }
   }
@@ -537,9 +533,14 @@ function nextLevel() {
     const timePlayed = time; // Store the time played
     const currentLevel = level; // Store the current level
     setTimeout(() => {
-      const playerName = prompt(
-        "Game Over. Your total score was " + score + ". Please enter your name:"
+      let playerName = prompt(
+        "                    Game Over\nEnter your name below:\n(Ps: Enter the same name if you want to update your previous score or click cancel to remain anonymous) "
       );
+
+      // Set playerName to "Anonymous" if the prompt is cancelled or empty
+      if (!playerName) {
+        playerName = "Anonymous";
+      }
 
       // Retrieve scores from local storage
       let scores = JSON.parse(localStorage.getItem("scores")) || [];
