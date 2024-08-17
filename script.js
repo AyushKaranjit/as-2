@@ -1110,12 +1110,12 @@ const buttons = [
 
 buttons.forEach((button) => {
   const btnElement = document.getElementById(button.id);
-  ["mousedown", "touchstart"].forEach((event) => {
+  ["mousedown"].forEach((event) => {
     btnElement.addEventListener(event, () =>
       handleButtonEvent(event, button.direction, true)
     );
   });
-  ["mouseup", "touchend", "mouseleave"].forEach((event) => {
+  ["mouseup","mouseleave"].forEach((event) => {
     btnElement.addEventListener(event, () =>
       handleButtonEvent(event, button.direction, false)
     );

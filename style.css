@@ -139,7 +139,7 @@ div p {
 }
 
 .enemy {
-  background-image: url('assets/images/ghost.png');
+  background-image: url("assets/images/ghost.png");
   background-size: cover;
   /* background-color: green; */
   border-radius: 100%;
@@ -156,7 +156,7 @@ div p {
 .wall {
   width: 80%;
   height: 80%;
-  border: 1px solid cyan;
+  border: 1px solid blueviolet;
   border-radius: 10px;
 }
 
@@ -278,12 +278,6 @@ button:nth-child(4) {
   grid-area: clear;
 }
 
-.top-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 #mute {
   padding: 10px;
   padding-left: 50px;
@@ -328,19 +322,24 @@ footer {
   font-size: 0.8em;
 }
 
-.controls {
+.top-controls {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-#soundIcon, #muteIcon, #pauseIcon, #playIcon {
+#soundIcon,
+#muteIcon,
+#pauseIcon,
+#playIcon {
   width: 50px;
   height: 50px;
   cursor: pointer;
-  margin: 0 10px; /* Adjust the margin as needed */
+  margin: 0 10px;
 }
 
-#muteIcon, #playIcon, #pauseIcon {
+#muteIcon,
+#playIcon,
+#pauseIcon {
   display: none;
 }
