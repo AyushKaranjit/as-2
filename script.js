@@ -4,29 +4,82 @@ let gameStarted = false;
 const startBtn = document.querySelector(".start");
 let timerInterval;
 const introSound = new Audio("assets/audio/intro.mp3");
-const wakawakaSound = new Audio("assets/audio/wakawaka.wav");
-wakawakaSound.loop = true; // Loop the sound
+const ghostSound = new Audio("assets/audio/ghost.mp3");
+ghostSound.loop = true;
+ghostSound.volume = 0.1;
 
 // MUTE BUTTON
-const muteBtn = document.getElementById("mute");
 let isMuted = false;
+const soundIcon = document.getElementById("soundIcon");
+const muteIcon = document.getElementById("muteIcon");
 
-muteBtn.addEventListener("click", () => {
+soundIcon.addEventListener("click", toggleMute);
+muteIcon.addEventListener("click", toggleMute);
+
+function toggleMute() {
   isMuted = !isMuted;
   if (isMuted) {
     introSound.muted = true;
-    wakawakaSound.muted = true;
+    ghostSound.muted = true;
     hitSound.muted = true;
     deathSound.muted = true;
-    muteBtn.textContent = "Unmute";
+    wakawakaSound.muted = true;
+    soundIcon.style.display = "none";
+    muteIcon.style.display = "block";
   } else {
     introSound.muted = false;
-    wakawakaSound.muted = false;
+    ghostSound.muted = false;
     hitSound.muted = false;
     deathSound.muted = false;
-    muteBtn.textContent = "Mute";
+    wakawakaSound.muted = false;
+    soundIcon.style.display = "block";
+    muteIcon.style.display = "none";
   }
-});
+}
+
+//===========================================================================================
+
+// PAUSE / PLAY BUTTON
+// Add these lines at the top of your script.js file
+const pauseIcon = document.getElementById("pauseIcon");
+const playIcon = document.getElementById("playIcon");
+
+pauseIcon.addEventListener("click", togglePause);
+playIcon.addEventListener("click", togglePause);
+
+let isPaused = false;
+
+function togglePause() {
+  isPaused = !isPaused;
+  if (isPaused) {
+    pauseGame();
+    pauseIcon.style.display = "none";
+    playIcon.style.display = "block";
+  } else {
+    resumeGame();
+    pauseIcon.style.display = "block";
+    playIcon.style.display = "none";
+  }
+}
+
+function pauseGame() {
+  ghostSound.pause();
+  clearInterval(timerInterval);
+  isMoving = false;
+  clearInterval(timerInterval); // Stop the timer
+ 
+}
+
+function resumeGame() {
+  if (ghostSound.paused) {
+    ghostSound.play();
+  }
+  timerInterval = setInterval(timeplayed, 1000);
+  isMoving = true;
+  
+}
+
+//===========================================================================================
 
 // Function to start the game
 function startGame() {
@@ -35,10 +88,11 @@ function startGame() {
   startBtn.style.display = "none";
   introSound.play();
   setTimeout(() => {
-    wakawakaSound.play();
-  },4500);
+    ghostSound.play();
+  }, 4500);
   setTimeout(() => {
     timerInterval = setInterval(timeplayed, 1000);
+    pauseIcon.style.display = "block";
   }, 4000);
 }
 
@@ -215,9 +269,10 @@ function checkWallCollisionForEnemy(enemy) {
 }
 
 // Function to move the enemies
+let isMoving = true;
+
 function moveEnemies() {
-  if (!gameStarted) return;
-  {
+  if (gameStarted && isMoving) {
     enemies = document.querySelectorAll(".enemy");
 
     for (let enemy of enemies) {
@@ -282,11 +337,10 @@ player.style.width = "75%";
 player.style.height = "75%";
 let playerTop = 0;
 let playerLeft = 0;
-let isMoving = true;
 
 // Function to move the player based on key presses
 function movePlayer() {
-  if (gameStarted && isMoving) {
+  if (gameStarted && isMoving && !isPaused) {
     // Move player down
     if (downPressed) {
       playerTop = playerTop + 2;
@@ -297,7 +351,6 @@ function movePlayer() {
         playerTop = playerTop - 2;
         player.style.top = playerTop + "px";
       }
-
       checkPointCollision();
     }
     // Move player up
@@ -310,7 +363,6 @@ function movePlayer() {
         playerTop = playerTop + 2;
         player.style.top = playerTop + "px";
       }
-
       checkPointCollision();
     }
     // Move player left
@@ -323,7 +375,6 @@ function movePlayer() {
         playerLeft = playerLeft + 2;
         player.style.left = playerLeft + "px";
       }
-
       checkPointCollision();
     }
     // Move player right
@@ -336,7 +387,6 @@ function movePlayer() {
         playerLeft = playerLeft - 2;
         player.style.left = playerLeft + "px";
       }
-
       checkPointCollision();
     }
   }
@@ -448,7 +498,7 @@ function nextLevel() {
 
   // Function to move the player based on key presses
   function movePlayer() {
-    if (gameStarted && isMoving) {
+    if (gameStarted && isMoving && !isPaused) {
       // Move player down
       if (downPressed) {
         playerTop = playerTop + 2;
@@ -544,6 +594,17 @@ function nextLevel() {
         point.classList.remove("point");
         score += 10;
         document.querySelector(".score p").textContent = score;
+        wakawakaSound.play();
+        wakawakaSound.play();
+
+        if (wakawakaTimer) {
+          clearTimeout(wakawakaTimer);
+        }
+
+        wakawakaTimer = setTimeout(() => {
+          wakawakaSound.pause();
+          wakawakaSound.currentTime = 0;
+        }, 250);
       }
     }
   }
@@ -559,9 +620,12 @@ function nextLevel() {
   }
 
   function gameOver() {
+    ghostSound.pause();
+    ghostSound.currentTime = 0;
     stopTimer();
     gameStarted = false;
     player.classList.add("dead");
+
     const timePlayed = time; // Store the time played
     const currentLevel = level; // Store the current level
     setTimeout(() => {
@@ -661,29 +725,30 @@ function nextLevel() {
 
   function EnemyHit() {
     player.classList.add("hit");
+    ghostSound.pause();
+    ghostSound.currentTime = 0;
     wakawakaSound.pause();
     wakawakaSound.currentTime = 0;
     isMoving = false;
     removeLife();
-  
+
     // Play hit.mp3
     hitSound.play();
-  
+
     setTimeout(() => {
       // Stop hit.mp3 after 2 seconds
       hitSound.pause();
       hitSound.currentTime = 0;
-  
-      // Resume wakawaka.wav
-      wakawakaSound.play();
+
+      // Resume ghost.mp3
+      ghostSound.play();
       player.classList.remove("hit");
       isMoving = true;
       if (lives == 0) {
         isMoving = false;
-        wakawakaSound.pause();
-        wakawakaSound.currentTime = 0
+        ghostSound.pause();
+        ghostSound.currentTime = 0;
         deathSound.play();
-  
       }
     }, 2000);
   }
@@ -734,6 +799,9 @@ function nextLevel() {
 
 // Points Detection
 let score = 0;
+const wakawakaSound = new Audio("assets/audio/wakawaka.wav");
+wakawakaSound.volume = 0.1; // Adjust the volume as needed
+let wakawakaTimer; // Timer to stop the sound
 
 function checkPointCollision() {
   const playerRect = player.getBoundingClientRect();
@@ -755,6 +823,18 @@ function checkPointCollision() {
       point.classList.remove("point");
       score += 10;
       document.querySelector(".score p").textContent = score;
+      wakawakaSound.play();
+      wakawakaSound.play();
+
+      if (wakawakaTimer) {
+        clearTimeout(wakawakaTimer);
+      }
+
+      // Set a new timer to stop the sound after 2 seconds
+      wakawakaTimer = setTimeout(() => {
+        wakawakaSound.pause();
+        wakawakaSound.currentTime = 0;
+      }, 250);
     }
   }
 }
@@ -767,6 +847,8 @@ function stopTimer() {
 }
 
 function gameOver() {
+  ghostSound.pause();
+  ghostSound.currentTime = 0;
   stopTimer();
   gameStarted = false;
   player.classList.add("dead");
@@ -912,13 +994,17 @@ function removeLife() {
 // Function to handle the hit animation and disable movement
 // Create a new Audio object for hit.mp3
 const hitSound = new Audio("assets/audio/hit.mp3");
+hitSound.volume = 0.1;
 const deathSound = new Audio("assets/audio/death.wav");
+deathSound.volume = 0.1;
 // Function to handle the hit animation and disable movement
 function EnemyHit() {
   player.classList.add("hit");
-  wakawakaSound.pause();
-  wakawakaSound.currentTime = 0;
+  ghostSound.pause();
+  ghostSound.currentTime = 0;
   isMoving = false;
+  ghostSound.pause();
+  ghostSound.currentTime = 0;
   removeLife();
 
   // Play hit.mp3
@@ -929,16 +1015,15 @@ function EnemyHit() {
     hitSound.pause();
     hitSound.currentTime = 0;
 
-    // Resume wakawaka.wav
-    wakawakaSound.play();
+    // Resume ghost.mp3
+    ghostSound.play();
     player.classList.remove("hit");
     isMoving = true;
     if (lives == 0) {
       isMoving = false;
-      wakawakaSound.pause();
-      wakawakaSound.currentTime = 0
+      ghostSound.pause();
+      ghostSound.currentTime = 0;
       deathSound.play();
-
     }
   }, 2000);
 }
