@@ -1043,13 +1043,13 @@ function nextLevel() {
 
           collisionCooldown = true;
           clearInterval(collisionInterval);
-          collisionInterval = setInterval(checkEnemyCollision, 1500);
+          collisionInterval = setInterval(checkEnemyCollision, 3000);
 
           setTimeout(() => {
             collisionCooldown = false;
             clearInterval(collisionInterval);
             collisionInterval = setInterval(checkEnemyCollision, 100);
-          }, 1500);
+          }, 3000);
 
           if (lives == 0) {
             gameOverState = true;
