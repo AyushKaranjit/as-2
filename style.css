@@ -141,8 +141,6 @@ div p {
 .enemy {
   background-image: url("assets/images/ghost.png");
   background-size: cover;
-  /* background-color: green; */
-  border-radius: 100%;
   height: 100%;
   width: 100%;
   position: relative;

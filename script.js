@@ -13,9 +13,6 @@ let isMuted = false;
 const soundIcon = document.getElementById("soundIcon");
 const muteIcon = document.getElementById("muteIcon");
 
-soundIcon.addEventListener("click", toggleMute);
-muteIcon.addEventListener("click", toggleMute);
-
 function toggleMute() {
   isMuted = !isMuted;
   if (isMuted) {
@@ -44,9 +41,6 @@ function toggleMute() {
 const pauseIcon = document.getElementById("pauseIcon");
 const playIcon = document.getElementById("playIcon");
 
-pauseIcon.addEventListener("click", togglePause);
-playIcon.addEventListener("click", togglePause);
-
 let isPaused = false;
 
 function togglePause() {
@@ -66,8 +60,6 @@ function pauseGame() {
   ghostSound.pause();
   clearInterval(timerInterval);
   isMoving = false;
-  clearInterval(timerInterval); // Stop the timer
- 
 }
 
 function resumeGame() {
@@ -76,7 +68,6 @@ function resumeGame() {
   }
   timerInterval = setInterval(timeplayed, 1000);
   isMoving = true;
-  
 }
 
 //===========================================================================================
@@ -272,7 +263,7 @@ function checkWallCollisionForEnemy(enemy) {
 let isMoving = true;
 
 function moveEnemies() {
-  if (gameStarted && isMoving) {
+  if (gameStarted && isMoving && !isPaused) {
     enemies = document.querySelectorAll(".enemy");
 
     for (let enemy of enemies) {
@@ -442,6 +433,282 @@ function formatTimeForLeaderboard(seconds) {
   const remainingSeconds = seconds % 60;
   return `${minutes}m ${remainingSeconds}s`;
 }
+
+// ===========================================================================================
+
+// Points Detection
+let score = 0;
+const wakawakaSound = new Audio("assets/audio/wakawaka.wav");
+wakawakaSound.volume = 0.1; // Adjust the volume as needed
+let wakawakaTimer; // Timer to stop the sound
+
+function checkPointCollision() {
+  const playerRect = player.getBoundingClientRect();
+  const points = document.querySelectorAll(".point");
+
+  if (points.length === 0) {
+    nextLevel();
+  }
+
+  for (let point of points) {
+    const pointRect = point.getBoundingClientRect();
+
+    if (
+      playerRect.top < pointRect.bottom &&
+      playerRect.bottom > pointRect.top &&
+      playerRect.left < pointRect.right &&
+      playerRect.right > pointRect.left
+    ) {
+      point.classList.remove("point");
+      score += 10;
+      document.querySelector(".score p").textContent = score;
+      wakawakaSound.play();
+      wakawakaSound.play();
+
+      if (wakawakaTimer) {
+        clearTimeout(wakawakaTimer);
+      }
+
+      // Set a new timer to stop the sound after 2 seconds
+      wakawakaTimer = setTimeout(() => {
+        wakawakaSound.pause();
+        wakawakaSound.currentTime = 0;
+      }, 250);
+    }
+  }
+}
+
+//===========================================================================================
+
+// GAME OVER
+function stopTimer() {
+  clearInterval(timerInterval);
+}
+
+function gameOver() {
+  ghostSound.pause();
+  ghostSound.currentTime = 0;
+  stopTimer();
+  gameStarted = false;
+  player.classList.add("dead");
+
+  const timePlayed = time; // Store the time played
+  const currentLevel = level; // Store the current level
+  setTimeout(() => {
+    let playerName = prompt(
+      "                    Game Over\nEnter your name below:\n(Ps: Enter the same name if you want to update your previous score or click cancel to remain anonymous) "
+    );
+
+    // Set playerName to "Anonymous" if the prompt is cancelled or empty
+    if (!playerName) {
+      playerName = "Anonymous";
+    }
+
+    // Retrieve scores from local storage
+    let scores = JSON.parse(localStorage.getItem("scores")) || [];
+
+    // Check if the player name already exists
+    const existingPlayerIndex = scores.findIndex(
+      (entry) => entry.name === playerName
+    );
+
+    if (existingPlayerIndex !== -1) {
+      // Replace the old data with the new data
+      scores[existingPlayerIndex] = {
+        name: playerName,
+        score: score,
+        time: timePlayed,
+        level: currentLevel,
+      };
+    } else {
+      // Add new data
+      scores.push({
+        name: playerName,
+        score: score,
+        time: timePlayed,
+        level: currentLevel,
+      });
+    }
+
+    // Save the updated scores to local storage
+    localStorage.setItem("scores", JSON.stringify(scores));
+
+    updateLeaderboard();
+    restartBtn.style.display = "flex";
+  }, 3000);
+}
+
+//===========================================================================================
+
+// LEADERBOARD
+
+const leaderboard = document.querySelector(".leaderboard");
+if (leaderboard) {
+  leaderboard.style.wordWrap = "break-word";
+  leaderboard.style.wordBreak = "break-all";
+}
+
+// Function to update the leaderboard
+// Function to update the leaderboard
+function updateLeaderboard() {
+  const leaderboard = document.querySelector(".leaderboard ol");
+  if (!leaderboard) return;
+
+  // Retrieve scores from local storage
+  let scores = JSON.parse(localStorage.getItem("scores")) || [];
+
+  // Sort scores first by score in descending order, then by time in ascending order
+  scores.sort((a, b) => {
+    if (b.score === a.score) {
+      return a.time - b.time; // Less time is better
+    }
+    return b.score - a.score;
+  });
+
+  // Clear the current leaderboard
+  leaderboard.innerHTML = "";
+
+  // Populate the leaderboard with the sorted scores
+  scores.forEach((entry) => {
+    const li = document.createElement("li");
+    li.innerHTML = `${
+      entry.name
+    }<br><p style="font-size: 1em; margin-top: 0.5em; margin-left: 0em;">Score: ${
+      entry.score
+    }<br><p style="font-size: 1em; margin-top: 0.5em; margin-left: 0em;"> Level: ${
+      entry.level
+    }<br> <p style="font-size: 1em; margin-top: 0.5em; margin-left: 0em;">Time : ${formatTimeForLeaderboard(
+      entry.time
+    )}</p>`;
+    leaderboard.appendChild(li);
+  });
+}
+
+// Call updateLeaderboard to display the leaderboard
+updateLeaderboard();
+
+// ===========================================================================================
+
+// UPDATE LIVES
+
+let lives = 3;
+
+// Function to display lives
+function displayLives() {
+  const livesContainer = document.createElement("div");
+  livesContainer.classList.add("lives");
+
+  // Create and add the h1 element
+  const livesHeader = document.createElement("h1");
+  livesHeader.textContent = "Lives:";
+  livesContainer.appendChild(livesHeader);
+
+  const livesList = document.createElement("ul");
+
+  for (let i = 0; i < lives; i++) {
+    const life = document.createElement("li");
+    life.classList.add("life");
+    livesList.appendChild(life);
+  }
+
+  livesContainer.appendChild(livesList);
+  document.body.appendChild(livesContainer);
+}
+
+// Call displayLives at the start of the game
+displayLives();
+
+// Function to remove one life
+function removeLife() {
+  const livesUL = document.querySelector(".lives ul");
+  if (livesUL.children.length > 0) {
+    livesUL.removeChild(livesUL.children[0]);
+  }
+}
+
+// ===========================================================================================
+
+// ENEMY COLLISION
+
+// Function to handle the hit animation and disable movement
+// Create a new Audio object for hit.mp3
+const hitSound = new Audio("assets/audio/hit.mp3");
+hitSound.volume = 0.1;
+const deathSound = new Audio("assets/audio/death.wav");
+deathSound.volume = 0.1;
+// Function to handle the hit animation and disable movement
+function EnemyHit() {
+  player.classList.add("hit");
+  ghostSound.pause();
+  ghostSound.currentTime = 0;
+  isMoving = false;
+  ghostSound.pause();
+  ghostSound.currentTime = 0;
+  removeLife();
+
+  // Play hit.mp3
+  hitSound.play();
+
+  setTimeout(() => {
+    // Stop hit.mp3 after 2 seconds
+    hitSound.pause();
+    hitSound.currentTime = 0;
+
+    // Resume ghost.mp3
+    ghostSound.play();
+    player.classList.remove("hit");
+    isMoving = true;
+    if (lives == 0) {
+      isMoving = false;
+      ghostSound.pause();
+      ghostSound.currentTime = 0;
+      deathSound.play();
+    }
+  }, 2000);
+}
+// Function to check for enemy collisions
+let gameOverState = false;
+let collisionCooldown = false;
+let collisionInterval = setInterval(checkEnemyCollision, 100);
+
+function checkEnemyCollision() {
+  const playerRect = player.getBoundingClientRect();
+  const enemies = document.querySelectorAll(".enemy");
+
+  for (let enemy of enemies) {
+    const enemyRect = enemy.getBoundingClientRect();
+
+    if (
+      playerRect.top < enemyRect.bottom &&
+      playerRect.bottom > enemyRect.top &&
+      playerRect.left < enemyRect.right &&
+      playerRect.right > enemyRect.left
+    ) {
+      if (!gameOverState && !collisionCooldown) {
+        EnemyHit();
+        lives--;
+
+        collisionCooldown = true;
+        clearInterval(collisionInterval);
+        collisionInterval = setInterval(checkEnemyCollision, 3000);
+
+        setTimeout(() => {
+          collisionCooldown = false;
+          clearInterval(collisionInterval);
+          collisionInterval = setInterval(checkEnemyCollision, 100);
+        }, 3000);
+
+        if (lives == 0) {
+          gameOverState = true;
+          gameOver();
+        }
+      }
+    }
+  }
+}
+
+// Periodically check for enemy collisions
+setInterval(checkEnemyCollision, 100);
 
 // ===========================================================================================
 
@@ -795,281 +1062,6 @@ function nextLevel() {
 
   setInterval(checkEnemyCollision, 100);
 }
-// ===========================================================================================
-
-// Points Detection
-let score = 0;
-const wakawakaSound = new Audio("assets/audio/wakawaka.wav");
-wakawakaSound.volume = 0.1; // Adjust the volume as needed
-let wakawakaTimer; // Timer to stop the sound
-
-function checkPointCollision() {
-  const playerRect = player.getBoundingClientRect();
-  const points = document.querySelectorAll(".point");
-
-  if (points.length === 0) {
-    nextLevel();
-  }
-
-  for (let point of points) {
-    const pointRect = point.getBoundingClientRect();
-
-    if (
-      playerRect.top < pointRect.bottom &&
-      playerRect.bottom > pointRect.top &&
-      playerRect.left < pointRect.right &&
-      playerRect.right > pointRect.left
-    ) {
-      point.classList.remove("point");
-      score += 10;
-      document.querySelector(".score p").textContent = score;
-      wakawakaSound.play();
-      wakawakaSound.play();
-
-      if (wakawakaTimer) {
-        clearTimeout(wakawakaTimer);
-      }
-
-      // Set a new timer to stop the sound after 2 seconds
-      wakawakaTimer = setTimeout(() => {
-        wakawakaSound.pause();
-        wakawakaSound.currentTime = 0;
-      }, 250);
-    }
-  }
-}
-
-//===========================================================================================
-
-// GAME OVER
-function stopTimer() {
-  clearInterval(timerInterval);
-}
-
-function gameOver() {
-  ghostSound.pause();
-  ghostSound.currentTime = 0;
-  stopTimer();
-  gameStarted = false;
-  player.classList.add("dead");
-
-  const timePlayed = time; // Store the time played
-  const currentLevel = level; // Store the current level
-  setTimeout(() => {
-    let playerName = prompt(
-      "                    Game Over\nEnter your name below:\n(Ps: Enter the same name if you want to update your previous score or click cancel to remain anonymous) "
-    );
-
-    // Set playerName to "Anonymous" if the prompt is cancelled or empty
-    if (!playerName) {
-      playerName = "Anonymous";
-    }
-
-    // Retrieve scores from local storage
-    let scores = JSON.parse(localStorage.getItem("scores")) || [];
-
-    // Check if the player name already exists
-    const existingPlayerIndex = scores.findIndex(
-      (entry) => entry.name === playerName
-    );
-
-    if (existingPlayerIndex !== -1) {
-      // Replace the old data with the new data
-      scores[existingPlayerIndex] = {
-        name: playerName,
-        score: score,
-        time: timePlayed,
-        level: currentLevel,
-      };
-    } else {
-      // Add new data
-      scores.push({
-        name: playerName,
-        score: score,
-        time: timePlayed,
-        level: currentLevel,
-      });
-    }
-
-    // Save the updated scores to local storage
-    localStorage.setItem("scores", JSON.stringify(scores));
-
-    updateLeaderboard();
-    restartBtn.style.display = "flex";
-  }, 3000);
-}
-
-//===========================================================================================
-
-// LEADERBOARD
-
-const leaderboard = document.querySelector(".leaderboard");
-if (leaderboard) {
-  leaderboard.style.wordWrap = "break-word";
-  leaderboard.style.wordBreak = "break-all";
-}
-
-// Function to update the leaderboard
-// Function to update the leaderboard
-function updateLeaderboard() {
-  const leaderboard = document.querySelector(".leaderboard ol");
-  if (!leaderboard) return;
-
-  // Retrieve scores from local storage
-  let scores = JSON.parse(localStorage.getItem("scores")) || [];
-
-  // Sort scores first by score in descending order, then by time in ascending order
-  scores.sort((a, b) => {
-    if (b.score === a.score) {
-      return a.time - b.time; // Less time is better
-    }
-    return b.score - a.score;
-  });
-
-  // Clear the current leaderboard
-  leaderboard.innerHTML = "";
-
-  // Populate the leaderboard with the sorted scores
-  scores.forEach((entry) => {
-    const li = document.createElement("li");
-    li.innerHTML = `${
-      entry.name
-    }<br><p style="font-size: 1em; margin-top: 0.5em; margin-left: 0em;">Score: ${
-      entry.score
-    }<br><p style="font-size: 1em; margin-top: 0.5em; margin-left: 0em;"> Level: ${
-      entry.level
-    }<br> <p style="font-size: 1em; margin-top: 0.5em; margin-left: 0em;">Time : ${formatTimeForLeaderboard(
-      entry.time
-    )}</p>`;
-    leaderboard.appendChild(li);
-  });
-}
-
-// Call updateLeaderboard to display the leaderboard
-updateLeaderboard();
-
-// ===========================================================================================
-
-// UPDATE LIVES
-
-let lives = 3;
-
-// Function to display lives
-function displayLives() {
-  const livesContainer = document.createElement("div");
-  livesContainer.classList.add("lives");
-
-  // Create and add the h1 element
-  const livesHeader = document.createElement("h1");
-  livesHeader.textContent = "Lives:";
-  livesContainer.appendChild(livesHeader);
-
-  const livesList = document.createElement("ul");
-
-  for (let i = 0; i < lives; i++) {
-    const life = document.createElement("li");
-    life.classList.add("life");
-    livesList.appendChild(life);
-  }
-
-  livesContainer.appendChild(livesList);
-  document.body.appendChild(livesContainer);
-}
-
-// Call displayLives at the start of the game
-displayLives();
-
-// Function to remove one life
-function removeLife() {
-  const livesUL = document.querySelector(".lives ul");
-  if (livesUL.children.length > 0) {
-    livesUL.removeChild(livesUL.children[0]);
-  }
-}
-
-// ===========================================================================================
-
-// ENEMY COLLISION
-
-// Function to handle the hit animation and disable movement
-// Create a new Audio object for hit.mp3
-const hitSound = new Audio("assets/audio/hit.mp3");
-hitSound.volume = 0.1;
-const deathSound = new Audio("assets/audio/death.wav");
-deathSound.volume = 0.1;
-// Function to handle the hit animation and disable movement
-function EnemyHit() {
-  player.classList.add("hit");
-  ghostSound.pause();
-  ghostSound.currentTime = 0;
-  isMoving = false;
-  ghostSound.pause();
-  ghostSound.currentTime = 0;
-  removeLife();
-
-  // Play hit.mp3
-  hitSound.play();
-
-  setTimeout(() => {
-    // Stop hit.mp3 after 2 seconds
-    hitSound.pause();
-    hitSound.currentTime = 0;
-
-    // Resume ghost.mp3
-    ghostSound.play();
-    player.classList.remove("hit");
-    isMoving = true;
-    if (lives == 0) {
-      isMoving = false;
-      ghostSound.pause();
-      ghostSound.currentTime = 0;
-      deathSound.play();
-    }
-  }, 2000);
-}
-// Function to check for enemy collisions
-let gameOverState = false;
-let collisionCooldown = false;
-let collisionInterval = setInterval(checkEnemyCollision, 100);
-
-function checkEnemyCollision() {
-  const playerRect = player.getBoundingClientRect();
-  const enemies = document.querySelectorAll(".enemy");
-
-  for (let enemy of enemies) {
-    const enemyRect = enemy.getBoundingClientRect();
-
-    if (
-      playerRect.top < enemyRect.bottom &&
-      playerRect.bottom > enemyRect.top &&
-      playerRect.left < enemyRect.right &&
-      playerRect.right > enemyRect.left
-    ) {
-      if (!gameOverState && !collisionCooldown) {
-        EnemyHit();
-        lives--;
-
-        collisionCooldown = true;
-        clearInterval(collisionInterval);
-        collisionInterval = setInterval(checkEnemyCollision, 2000);
-
-        setTimeout(() => {
-          collisionCooldown = false;
-          clearInterval(collisionInterval);
-          collisionInterval = setInterval(checkEnemyCollision, 100);
-        }, 2000);
-
-        if (lives == 0) {
-          gameOverState = true;
-          gameOver();
-        }
-      }
-    }
-  }
-}
-
-// Periodically check for enemy collisions
-setInterval(checkEnemyCollision, 100);
 
 // ===========================================================================================
 
@@ -1078,6 +1070,12 @@ setInterval(checkEnemyCollision, 100);
 // Event listeners for key down and up events
 document.addEventListener("keydown", keyDown);
 document.addEventListener("keyup", keyUp);
+
+soundIcon.addEventListener("click", toggleMute);
+muteIcon.addEventListener("click", toggleMute);
+
+pauseIcon.addEventListener("click", togglePause);
+playIcon.addEventListener("click", togglePause);
 
 startBtn.addEventListener("click", startGame);
 restartBtn.addEventListener("click", restartGame);
@@ -1115,7 +1113,7 @@ buttons.forEach((button) => {
       handleButtonEvent(event, button.direction, true)
     );
   });
-  ["mouseup","mouseleave"].forEach((event) => {
+  ["mouseup", "mouseleave"].forEach((event) => {
     btnElement.addEventListener(event, () =>
       handleButtonEvent(event, button.direction, false)
     );
