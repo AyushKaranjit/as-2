@@ -34,12 +34,13 @@ header {
 .startDiv {
   position: absolute;
   display: flex;
+  flex-direction: column;
   height: 100vh;
   align-items: center;
   justify-content: center;
 }
 
-.startDiv div {
+.start {
   background-color: #ccc;
   z-index: 100;
   cursor: pointer;
@@ -50,15 +51,46 @@ header {
   height: 32px;
 }
 
+.notice {
+  width: 100vh;
+  background-color: #ccc;
+  line-height: 3em;
+  z-index: 100;
+  cursor: pointer;
+  border-radius: 20px;
+  box-shadow: 4px 4px 4px #000;
+  padding: 20px 30px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  font-size: 0.6em;
+  height: 60vh;
+  margin-bottom: 20px;
+}
+
 .startDiv h1 {
   text-shadow: 2px 2px 2px #000;
   font-size: 2em;
   text-decoration: none;
   margin-left: 10px;
+  margin-right: 10px;
 }
 
 header h1 {
   font-size: 4em;
+}
+
+.startDiv li {
+  text-shadow: 2px 2px 2px #000;
+  font-size: 1.5em;
+  text-decoration: none;
+  margin-left: 20px;
+  margin-right: 10px;
+  text-align: left;
+}
+
+.start img {
+  height: 32px;
 }
 
 main {

@@ -2,6 +2,7 @@
 
 let gameStarted = false;
 const startBtn = document.querySelector(".start");
+const notice = document.querySelector(".notice");
 let timerInterval;
 const introSound = new Audio("assets/audio/intro.mp3");
 const ghostSound = new Audio("assets/audio/ghost.mp3");
@@ -77,10 +78,11 @@ function startGame() {
   gameStarted = true;
   restartBtn.style.display = "none";
   startBtn.style.display = "none";
+  notice.style.display = "none"; // Hide the notice
   introSound.play();
   setTimeout(() => {
     ghostSound.play();
-  }, 4500);
+  }, 5000);
   setTimeout(() => {
     timerInterval = setInterval(timeplayed, 1000);
     pauseIcon.style.display = "block";
@@ -315,7 +317,7 @@ function moveEnemies() {
 // Periodically call moveEnemies to update enemy positions
 setTimeout(() => {
   setInterval(moveEnemies, 100);
-}, 5000);
+}, 5500);
 
 // ===========================================================================================
 
@@ -386,7 +388,7 @@ function movePlayer() {
 // Periodically call movePlayer to update player position
 setTimeout(() => {
   setInterval(movePlayer, 10);
-}, 5000);
+}, 5500);
 
 // Collision detection with walls for players
 function checkWallCollisionForPlayer() {
@@ -496,7 +498,7 @@ function gameOver() {
   const currentLevel = level; // Store the current level
   setTimeout(() => {
     let playerName = prompt(
-      "                    Game Over\nEnter your name below:\n(Ps: Enter the same name if you want to update your previous score or click cancel to remain anonymous) "
+      "                    Game Over\nEnter your name below:"
     );
 
     // Set playerName to "Anonymous" if the prompt is cancelled or empty
@@ -690,13 +692,13 @@ function checkEnemyCollision() {
 
         collisionCooldown = true;
         clearInterval(collisionInterval);
-        collisionInterval = setInterval(checkEnemyCollision, 3000);
+        collisionInterval = setInterval(checkEnemyCollision, 4000);
 
         setTimeout(() => {
           collisionCooldown = false;
           clearInterval(collisionInterval);
           collisionInterval = setInterval(checkEnemyCollision, 100);
-        }, 3000);
+        }, 4000);
 
         if (lives == 0) {
           gameOverState = true;
@@ -897,7 +899,7 @@ function nextLevel() {
     const currentLevel = level; // Store the current level
     setTimeout(() => {
       let playerName = prompt(
-        "                    Game Over\nEnter your name below:\n(Ps: Enter the same name if you want to update your previous score or click cancel to remain anonymous) "
+        "                    Game Over\nEnter your name below:"
       );
 
       // Set playerName to "Anonymous" if the prompt is cancelled or empty
@@ -1043,13 +1045,13 @@ function nextLevel() {
 
           collisionCooldown = true;
           clearInterval(collisionInterval);
-          collisionInterval = setInterval(checkEnemyCollision, 3000);
+          collisionInterval = setInterval(checkEnemyCollision, 4000);
 
           setTimeout(() => {
             collisionCooldown = false;
             clearInterval(collisionInterval);
             collisionInterval = setInterval(checkEnemyCollision, 100);
-          }, 3000);
+          }, 4000);
 
           if (lives == 0) {
             gameOverState = true;
