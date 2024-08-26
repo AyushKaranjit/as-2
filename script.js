@@ -119,7 +119,7 @@ let rightPressed = false;
 
 const clearBtn = document.getElementById("clear");
 
-const main = document.querySelector("main");
+const main = document.getElementsByTagName("main")[0];
 
 // Maze layout: 1 = Wall, 2 = Player, 3 = Enemy, 0 = Point
 let maze = [
@@ -241,7 +241,7 @@ let direction = randomNumber();
 // Collision detection with walls for enemies
 function checkWallCollisionForEnemy(enemy) {
   const enemyRect = enemy.getBoundingClientRect();
-  const walls = document.querySelectorAll(".wall");
+  const walls = document.getElementsByClassName("wall");
 
   for (let wall of walls) {
     const wallRect = wall.getBoundingClientRect();
@@ -266,7 +266,7 @@ let isMoving = true;
 
 function moveEnemies() {
   if (gameStarted && isMoving && !isPaused) {
-    enemies = document.querySelectorAll(".enemy");
+    const enemies = document.getElementsByClassName("enemy");
 
     for (let enemy of enemies) {
       let enemyTop = parseInt(enemy.style.top) || 0;
@@ -324,8 +324,8 @@ setTimeout(() => {
 // PLAYER MOVEMENT
 
 // Initialize player and player mouth elements
-const player = document.querySelector("#player");
-const playerMouth = player.querySelector(".mouth");
+const player = document.getElementById("player");
+const playerMouth = player.getElementsByClassName("mouth")[0];
 player.style.width = "75%";
 player.style.height = "75%";
 let playerTop = 0;
@@ -393,7 +393,7 @@ setTimeout(() => {
 // Collision detection with walls for players
 function checkWallCollisionForPlayer() {
   const playerRect = player.getBoundingClientRect();
-  const walls = document.querySelectorAll(".wall");
+  const walls = document.getElementsByClassName("wall");
 
   for (let wall of walls) {
     const wallRect = wall.getBoundingClientRect();
@@ -419,7 +419,9 @@ let time = 0;
 
 function timeplayed() {
   time++;
-  document.querySelector(".time p").textContent = formatTime(time);
+  document
+    .getElementsByClassName("time")[0]
+    .getElementsByTagName("p")[0].textContent = formatTime(time);
 }
 
 function formatTime(seconds) {
@@ -446,7 +448,7 @@ let wakawakaTimer; // Timer to stop the sound
 
 function checkPointCollision() {
   const playerRect = player.getBoundingClientRect();
-  const points = document.querySelectorAll(".point");
+  const points = document.getElementsByClassName("point");
 
   if (points.length === 0) {
     nextLevel();
@@ -463,7 +465,9 @@ function checkPointCollision() {
     ) {
       point.classList.remove("point");
       score += 10;
-      document.querySelector(".score p").textContent = score;
+      document
+        .getElementsByClassName("score")[0]
+        .getElementsByTagName("p")[0].textContent = score;
       wakawakaSound.play();
       wakawakaSound.play();
 
@@ -544,16 +548,17 @@ function gameOver() {
 
 // LEADERBOARD
 
-const leaderboard = document.querySelector(".leaderboard");
+const leaderboard = document.getElementById("leaderboard");
 if (leaderboard) {
   leaderboard.style.wordWrap = "break-word";
   leaderboard.style.wordBreak = "break-all";
 }
 
 // Function to update the leaderboard
-// Function to update the leaderboard
 function updateLeaderboard() {
-  const leaderboard = document.querySelector(".leaderboard ol");
+  const leaderboard = document
+    .getElementsByClassName("leaderboard")[0]
+    .getElementsByTagName("ol")[0];
   if (!leaderboard) return;
 
   // Retrieve scores from local storage
@@ -598,6 +603,7 @@ let lives = 3;
 // Function to display lives
 function displayLives() {
   const livesContainer = document.createElement("div");
+  livesContainer.id = "lives";
   livesContainer.classList.add("lives");
 
   // Create and add the h1 element
@@ -622,9 +628,12 @@ displayLives();
 
 // Function to remove one life
 function removeLife() {
-  const livesUL = document.querySelector(".lives ul");
-  if (livesUL.children.length > 0) {
-    livesUL.removeChild(livesUL.children[0]);
+  const livesContainer = document.getElementById("lives");
+  if (livesContainer) {
+    const livesUL = livesContainer.getElementsByTagName("ul")[0];
+    if (livesUL && livesUL.children.length > 0) {
+      livesUL.removeChild(livesUL.children[0]);
+    }
   }
 }
 
@@ -675,7 +684,7 @@ let collisionInterval = setInterval(checkEnemyCollision, 100);
 
 function checkEnemyCollision() {
   const playerRect = player.getBoundingClientRect();
-  const enemies = document.querySelectorAll(".enemy");
+  const enemies = document.getElementsByClassName("enemy");
 
   for (let enemy of enemies) {
     const enemyRect = enemy.getBoundingClientRect();
@@ -755,10 +764,12 @@ function nextLevel() {
   generateMaze(maze);
 
   level++;
-  document.querySelector(".level p").textContent = level;
+  document
+    .getElementsByClassName("level")[0]
+    .getElementsByTagName("p")[0].textContent = level;
 
-  const player = document.querySelector("#player");
-  const playerMouth = player.querySelector(".mouth");
+  const player = document.getElementById("player");
+  const playerMouth = player.getElementsByClassName("mouth")[0];
   player.style.width = "75%";
   player.style.height = "75%";
   let playerTop = 0;
@@ -823,7 +834,7 @@ function nextLevel() {
 
   function checkWallCollisionForPlayer() {
     const playerRect = player.getBoundingClientRect();
-    const walls = document.querySelectorAll(".wall");
+    const walls = document.getElementsByClassName("wall");
 
     for (let wall of walls) {
       const wallRect = wall.getBoundingClientRect();
@@ -845,7 +856,7 @@ function nextLevel() {
 
   function checkPointCollision() {
     const playerRect = player.getBoundingClientRect();
-    const points = document.querySelectorAll(".point");
+    const points = document.getElementsByClassName("point");
 
     if (points.length === 0) {
       nextLevel();
@@ -862,7 +873,9 @@ function nextLevel() {
       ) {
         point.classList.remove("point");
         score += 10;
-        document.querySelector(".score p").textContent = score;
+        document
+          .getElementsByClassName("score")[0]
+          .getElementsByTagName("p")[0].textContent = score;
         wakawakaSound.play();
         wakawakaSound.play();
 
@@ -941,7 +954,7 @@ function nextLevel() {
     }, 3000);
   }
 
-  const leaderboard = document.querySelector(".leaderboard");
+  const leaderboard = document.getElementById("leaderboard");
   if (leaderboard) {
     leaderboard.style.wordWrap = "break-word";
     leaderboard.style.wordBreak = "break-all";
@@ -949,7 +962,9 @@ function nextLevel() {
 
   // Function to update the leaderboard
   function updateLeaderboard() {
-    const leaderboard = document.querySelector(".leaderboard ol");
+    const leaderboard = document
+      .getElementsByClassName("leaderboard")[0]
+      .getElementsByTagName("ol")[0];
     if (!leaderboard) return;
 
     // Retrieve scores from local storage
@@ -986,9 +1001,12 @@ function nextLevel() {
   updateLeaderboard();
 
   function removeLife() {
-    const livesUL = document.querySelector(".lives ul");
-    if (livesUL.children.length > 0) {
-      livesUL.removeChild(livesUL.children[0]);
+    const livesContainer = document.getElementById("lives");
+    if (livesContainer) {
+      const livesUL = livesContainer.getElementsByTagName("ul")[0];
+      if (livesUL && livesUL.children.length > 0) {
+        livesUL.removeChild(livesUL.children[0]);
+      }
     }
   }
 
@@ -1028,7 +1046,7 @@ function nextLevel() {
 
   function checkEnemyCollision() {
     const playerRect = player.getBoundingClientRect();
-    const enemies = document.querySelectorAll(".enemy");
+    const enemies = document.getElementsByClassName("enemy");
 
     for (let enemy of enemies) {
       const enemyRect = enemy.getBoundingClientRect();
