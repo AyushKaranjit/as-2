@@ -646,8 +646,6 @@ function EnemyHit() {
   ghostSound.pause();
   ghostSound.currentTime = 0;
   isMoving = false;
-  ghostSound.pause();
-  ghostSound.currentTime = 0;
   removeLife();
 
   // Play hit.mp3
