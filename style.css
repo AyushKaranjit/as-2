@@ -41,7 +41,7 @@ header {
 }
 
 .start {
-  background-color: #ccc;
+  background-color: blueviolet;
   z-index: 100;
   cursor: pointer;
   border-radius: 20px;
@@ -53,7 +53,7 @@ header {
 
 .notice {
   width: 100vh;
-  background-color: #ccc;
+  background-color: blueviolet;
   line-height: 3em;
   z-index: 100;
   cursor: pointer;
