@@ -1,8 +1,8 @@
 // START BUTTON
 
 let gameStarted = false;
-const startBtn = document.querySelector(".start");
-const notice = document.querySelector(".notice");
+const startBtn = document.getElementsByClassName("start")[0];
+const notice = document.getElementsByClassName("notice")[0];
 let timerInterval;
 const introSound = new Audio("assets/audio/intro.mp3");
 const ghostSound = new Audio("assets/audio/ghost.mp3");
@@ -78,7 +78,7 @@ function startGame() {
   gameStarted = true;
   restartBtn.style.display = "none";
   startBtn.style.display = "none";
-  notice.style.display = "none"; // Hide the notice
+  notice.style.display = "none";
   introSound.play();
   setTimeout(() => {
     ghostSound.play();
@@ -86,14 +86,14 @@ function startGame() {
   setTimeout(() => {
     timerInterval = setInterval(timeplayed, 1000);
     pauseIcon.style.display = "block";
-  }, 4000);
+  }, 4500);
 }
 
 // ===========================================================================================
 
 // RESTART BUTTON
 
-const restartBtn = document.querySelector(".restart");
+const restartBtn = document.getElementsByClassName("restart")[0];
 
 function restartGame() {
   localStorage.setItem("restartFlag", "true");
