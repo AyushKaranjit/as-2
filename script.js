@@ -199,6 +199,41 @@ function generateMaze() {
 }
 
 generateMaze();
+
+function getRandomHexColor() {
+  const letters = "0123456789ABCDEF";
+  let color = "#";
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
+function randomizeWallBorders() {
+  const borderStyles = [
+    "solid",
+    "dashed",
+    "dotted",
+    "double",
+    "groove",
+    "ridge",
+    "inset",
+    "outset",
+  ];
+  const randomBorderStyle =
+    borderStyles[Math.floor(Math.random() * borderStyles.length)];
+  const randomBorderColor = getRandomHexColor();
+  const randomBackgroundColor = getRandomHexColor();
+
+  const walls = document.getElementsByClassName("wall");
+  for (let wall of walls) {
+    wall.style.borderStyle = randomBorderStyle;
+    wall.style.borderColor = randomBorderColor;
+    wall.style.backgroundColor = randomBackgroundColor;
+  }
+}
+
+randomizeWallBorders();
 // ===========================================================================================
 
 // EVENT HANDLERS TO TRACK KEY PRESS STATES
@@ -768,6 +803,8 @@ function nextLevel() {
     .getElementsByClassName("level")[0]
     .getElementsByTagName("p")[0].textContent = level;
 
+  randomizeWallBorders();
+
   const player = document.getElementById("player");
   const playerMouth = player.getElementsByClassName("mouth")[0];
   player.style.width = "75%";
@@ -1111,14 +1148,22 @@ clearBtn.addEventListener("click", function () {
 });
 
 // Function to handle button events
-const handleButtonEvent = (event, direction, isPressed) => {
-  if (direction === "left") leftPressed = isPressed;
-  if (direction === "right") rightPressed = isPressed;
-  if (direction === "up") upPressed = isPressed;
-  if (direction === "down") downPressed = isPressed;
-};
+function handleButtonEvent(event, direction, isPressed) {
+  if (direction === "left") {
+    leftPressed = isPressed;
+  }
+  if (direction === "right") {
+    rightPressed = isPressed;
+  }
+  if (direction === "up") {
+    upPressed = isPressed;
+  }
+  if (direction === "down") {
+    downPressed = isPressed;
+  }
+}
 
-// Add event listeners for the buttons
+// Array of button configurations
 const buttons = [
   { id: "lbttn", direction: "left" },
   { id: "rbttn", direction: "right" },
@@ -1126,16 +1171,23 @@ const buttons = [
   { id: "dbttn", direction: "down" },
 ];
 
-buttons.forEach((button) => {
+// Loop through each button configuration
+buttons.forEach(function (button) {
+  // Get the button element by its ID
   const btnElement = document.getElementById(button.id);
-  ["mousedown"].forEach((event) => {
-    btnElement.addEventListener(event, () =>
-      handleButtonEvent(event, button.direction, true)
-    );
+
+  // Add event listeners for when the button is pressed
+  btnElement.addEventListener("mousedown", function (event) {
+    handleButtonEvent(event, button.direction, true);
   });
-  ["mouseup", "mouseleave"].forEach((event) => {
-    btnElement.addEventListener(event, () =>
-      handleButtonEvent(event, button.direction, false)
-    );
+
+  // Add event listeners for when the button is released
+  btnElement.addEventListener("mouseup", function (event) {
+    handleButtonEvent(event, button.direction, false);
+  });
+
+  // Add event listener for when the mouse leaves the button
+  btnElement.addEventListener("mouseleave", function (event) {
+    handleButtonEvent(event, button.direction, false);
   });
 });
