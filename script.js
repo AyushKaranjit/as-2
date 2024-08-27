@@ -8,6 +8,28 @@ const introSound = new Audio("assets/audio/intro.mp3");
 const ghostSound = new Audio("assets/audio/ghost.mp3");
 ghostSound.loop = true;
 ghostSound.volume = 0.1;
+introSound.volume = 0.1;
+
+function startGame() {
+  gameStarted = true;
+  restartBtn.style.display = "none";
+  startBtn.style.display = "none";
+  notice.style.display = "none";
+  introSound.play();
+
+  // Play the ghost sound after 5 seconds
+  setTimeout(() => {
+    ghostSound.play();
+  }, 5000);
+
+  // Start the game timer and show the pause icon after 4.5 seconds
+  setTimeout(() => {
+    timerInterval = setInterval(timeplayed, 1000);
+    pauseIcon.style.display = "block";
+  }, 4500);
+}
+
+// ===========================================================================================
 
 // MUTE BUTTON
 let isMuted = false;
@@ -15,8 +37,10 @@ const soundIcon = document.getElementById("soundIcon");
 const muteIcon = document.getElementById("muteIcon");
 
 function toggleMute() {
-  isMuted = !isMuted;
+  isMuted = !isMuted; // Toggle the mute state
+
   if (isMuted) {
+    // Mute all sounds and update icons
     introSound.muted = true;
     ghostSound.muted = true;
     hitSound.muted = true;
@@ -25,6 +49,7 @@ function toggleMute() {
     soundIcon.style.display = "none";
     muteIcon.style.display = "block";
   } else {
+    // Unmute all sounds and update icons
     introSound.muted = false;
     ghostSound.muted = false;
     hitSound.muted = false;
@@ -45,51 +70,34 @@ const playIcon = document.getElementById("playIcon");
 let isPaused = false;
 
 function togglePause() {
-  isPaused = !isPaused;
+  isPaused = !isPaused; // Toggle the pause state
+
   if (isPaused) {
-    pauseGame();
+    pauseGame(); // Pause the game
     pauseIcon.style.display = "none";
     playIcon.style.display = "block";
   } else {
-    resumeGame();
+    resumeGame(); // Resume the game
     pauseIcon.style.display = "block";
     playIcon.style.display = "none";
   }
 }
 
 function pauseGame() {
-  ghostSound.pause();
-  clearInterval(timerInterval);
-  isMoving = false;
+  ghostSound.pause(); // Pause the ghost sound
+  clearInterval(timerInterval); // Stop the game timer
+  isMoving = false; // Stop game movements
 }
 
 function resumeGame() {
   if (ghostSound.paused) {
-    ghostSound.play();
+    ghostSound.play(); // Play the ghost sound if paused
   }
-  timerInterval = setInterval(timeplayed, 1000);
-  isMoving = true;
+  timerInterval = setInterval(timeplayed, 1000); // Restart the game timer
+  isMoving = true; // Resume game movements
 }
 
 //===========================================================================================
-
-// Function to start the game
-function startGame() {
-  gameStarted = true;
-  restartBtn.style.display = "none";
-  startBtn.style.display = "none";
-  notice.style.display = "none";
-  introSound.play();
-  setTimeout(() => {
-    ghostSound.play();
-  }, 5000);
-  setTimeout(() => {
-    timerInterval = setInterval(timeplayed, 1000);
-    pauseIcon.style.display = "block";
-  }, 4500);
-}
-
-// ===========================================================================================
 
 // RESTART BUTTON
 
@@ -209,7 +217,7 @@ function getRandomHexColor() {
   return color;
 }
 
-function randomizeWallBorders() {
+function randomizeWalls() {
   const borderStyles = [
     "solid",
     "dashed",
@@ -233,7 +241,7 @@ function randomizeWallBorders() {
   }
 }
 
-randomizeWallBorders();
+randomizeWalls();
 // ===========================================================================================
 
 // EVENT HANDLERS TO TRACK KEY PRESS STATES
@@ -275,17 +283,17 @@ let direction = randomNumber();
 
 // Collision detection with walls for enemies
 function checkWallCollisionForEnemy(enemy) {
-  const enemyRect = enemy.getBoundingClientRect();
+  const enemyBoundary = enemy.getBoundingClientRect();
   const walls = document.getElementsByClassName("wall");
 
   for (let wall of walls) {
-    const wallRect = wall.getBoundingClientRect();
+    const WallBoundary = wall.getBoundingClientRect();
 
     if (
-      enemyRect.top < wallRect.bottom &&
-      enemyRect.bottom > wallRect.top &&
-      enemyRect.left < wallRect.right &&
-      enemyRect.right > wallRect.left
+      enemyBoundary.top < WallBoundary.bottom &&
+      enemyBoundary.bottom > WallBoundary.top &&
+      enemyBoundary.left < WallBoundary.right &&
+      enemyBoundary.right > WallBoundary.left
     ) {
       // Collision detected with wall
       return true;
@@ -310,7 +318,7 @@ function moveEnemies() {
 
       if (direction === 1) {
         // MOVE DOWN
-        enemy.style.top = enemyTop + 12 + "px";
+        enemy.style.top = enemyTop + 10 + "px";
         if (checkWallCollisionForEnemy(enemy)) {
           enemy.style.top = enemyTop + "px";
           direction = randomNumber();
@@ -319,7 +327,7 @@ function moveEnemies() {
 
       if (direction === 2) {
         // MOVE UP
-        enemy.style.top = enemyTop - 12 + "px";
+        enemy.style.top = enemyTop - 10 + "px";
         if (checkWallCollisionForEnemy(enemy)) {
           enemy.style.top = enemyTop + "px";
           direction = randomNumber();
@@ -328,7 +336,7 @@ function moveEnemies() {
 
       if (direction === 3) {
         // MOVE LEFT
-        enemy.style.left = enemyLeft - 12 + "px";
+        enemy.style.left = enemyLeft - 10 + "px";
         if (checkWallCollisionForEnemy(enemy)) {
           enemy.style.left = enemyLeft + "px";
           direction = randomNumber();
@@ -337,7 +345,7 @@ function moveEnemies() {
 
       if (direction === 4) {
         // MOVE RIGHT
-        enemy.style.left = enemyLeft + 12 + "px";
+        enemy.style.left = enemyLeft + 10 + "px";
         if (checkWallCollisionForEnemy(enemy)) {
           enemy.style.left = enemyLeft + "px";
           direction = randomNumber();
@@ -349,7 +357,7 @@ function moveEnemies() {
   }
 }
 
-// Periodically call moveEnemies to update enemy positions
+// Periodically call moveEnemies to update enemy positions after 5.5 seconds
 setTimeout(() => {
   setInterval(moveEnemies, 100);
 }, 5500);
@@ -420,24 +428,24 @@ function movePlayer() {
   }
 }
 
-// Periodically call movePlayer to update player position
+// Periodically call movePlayer to update player position after 5.5 seconds
 setTimeout(() => {
   setInterval(movePlayer, 10);
 }, 5500);
 
 // Collision detection with walls for players
 function checkWallCollisionForPlayer() {
-  const playerRect = player.getBoundingClientRect();
+  const playerBoundary = player.getBoundingClientRect();
   const walls = document.getElementsByClassName("wall");
 
   for (let wall of walls) {
-    const wallRect = wall.getBoundingClientRect();
+    const WallBoundary = wall.getBoundingClientRect();
 
     if (
-      playerRect.top < wallRect.bottom &&
-      playerRect.bottom > wallRect.top &&
-      playerRect.left < wallRect.right &&
-      playerRect.right > wallRect.left
+      playerBoundary.top < WallBoundary.bottom &&
+      playerBoundary.bottom > WallBoundary.top &&
+      playerBoundary.left < WallBoundary.right &&
+      playerBoundary.right > WallBoundary.left
     ) {
       // Collision detected with wall
       return true;
@@ -482,7 +490,7 @@ wakawakaSound.volume = 0.1; // Adjust the volume as needed
 let wakawakaTimer; // Timer to stop the sound
 
 function checkPointCollision() {
-  const playerRect = player.getBoundingClientRect();
+  const playerBoundary = player.getBoundingClientRect();
   const points = document.getElementsByClassName("point");
 
   if (points.length === 0) {
@@ -490,20 +498,19 @@ function checkPointCollision() {
   }
 
   for (let point of points) {
-    const pointRect = point.getBoundingClientRect();
+    const pointBoundary = point.getBoundingClientRect();
 
     if (
-      playerRect.top < pointRect.bottom &&
-      playerRect.bottom > pointRect.top &&
-      playerRect.left < pointRect.right &&
-      playerRect.right > pointRect.left
+      playerBoundary.top < pointBoundary.bottom &&
+      playerBoundary.bottom > pointBoundary.top &&
+      playerBoundary.left < pointBoundary.right &&
+      playerBoundary.right > pointBoundary.left
     ) {
       point.classList.remove("point");
       score += 10;
       document
         .getElementsByClassName("score")[0]
         .getElementsByTagName("p")[0].textContent = score;
-      wakawakaSound.play();
       wakawakaSound.play();
 
       if (wakawakaTimer) {
@@ -545,17 +552,17 @@ function gameOver() {
       playerName = "Anonymous";
     }
 
-    // Retrieve scores from local storage
-    let scores = JSON.parse(localStorage.getItem("scores")) || [];
+    // Retrieve playerInfo from local storage
+    let playerInfo = JSON.parse(localStorage.getItem("playerInfo")) || [];
 
     // Check if the player name already exists
-    const existingPlayerIndex = scores.findIndex(
+    const existingPlayerIndex = playerInfo.findIndex(
       (entry) => entry.name === playerName
     );
 
     if (existingPlayerIndex !== -1) {
       // Replace the old data with the new data
-      scores[existingPlayerIndex] = {
+      playerInfo[existingPlayerIndex] = {
         name: playerName,
         score: score,
         time: timePlayed,
@@ -563,7 +570,7 @@ function gameOver() {
       };
     } else {
       // Add new data
-      scores.push({
+      playerInfo.push({
         name: playerName,
         score: score,
         time: timePlayed,
@@ -571,8 +578,8 @@ function gameOver() {
       });
     }
 
-    // Save the updated scores to local storage
-    localStorage.setItem("scores", JSON.stringify(scores));
+    // Save the updated playerInfo to local storage
+    localStorage.setItem("playerInfo", JSON.stringify(playerInfo));
 
     updateLeaderboard();
     restartBtn.style.display = "flex";
@@ -596,11 +603,11 @@ function updateLeaderboard() {
     .getElementsByTagName("ol")[0];
   if (!leaderboard) return;
 
-  // Retrieve scores from local storage
-  let scores = JSON.parse(localStorage.getItem("scores")) || [];
+  // Retrieve playerInfo from local storage
+  let playerInfo = JSON.parse(localStorage.getItem("playerInfo")) || [];
 
-  // Sort scores first by score in descending order, then by time in ascending order
-  scores.sort((a, b) => {
+  // Sort playerInfo first by score in descending order, then by time in ascending order
+  playerInfo.sort((a, b) => {
     if (b.score === a.score) {
       return a.time - b.time; // Less time is better
     }
@@ -610,8 +617,9 @@ function updateLeaderboard() {
   // Clear the current leaderboard
   leaderboard.innerHTML = "";
 
-  // Populate the leaderboard with the sorted scores
-  scores.forEach((entry) => {
+  // Populate the leaderboard with the sorted playerInfo
+  for (let i = 0; i < playerInfo.length; i++) {
+    const entry = playerInfo[i];
     const li = document.createElement("li");
     li.innerHTML = `${
       entry.name
@@ -623,7 +631,7 @@ function updateLeaderboard() {
       entry.time
     )}</p>`;
     leaderboard.appendChild(li);
-  });
+  }
 }
 
 // Call updateLeaderboard to display the leaderboard
@@ -676,8 +684,6 @@ function removeLife() {
 
 // ENEMY COLLISION
 
-// Function to handle the hit animation and disable movement
-// Create a new Audio object for hit.mp3
 const hitSound = new Audio("assets/audio/hit.mp3");
 hitSound.volume = 0.1;
 const deathSound = new Audio("assets/audio/death.wav");
@@ -688,11 +694,7 @@ function EnemyHit() {
   ghostSound.pause();
   ghostSound.currentTime = 0;
   isMoving = false;
-  ghostSound.pause();
-  ghostSound.currentTime = 0;
   removeLife();
-
-  // Play hit.mp3
   hitSound.play();
 
   setTimeout(() => {
@@ -718,17 +720,17 @@ let collisionCooldown = false;
 let collisionInterval = setInterval(checkEnemyCollision, 100);
 
 function checkEnemyCollision() {
-  const playerRect = player.getBoundingClientRect();
+  const playerBoundary = player.getBoundingClientRect();
   const enemies = document.getElementsByClassName("enemy");
 
   for (let enemy of enemies) {
-    const enemyRect = enemy.getBoundingClientRect();
+    const enemyBoundary = enemy.getBoundingClientRect();
 
     if (
-      playerRect.top < enemyRect.bottom &&
-      playerRect.bottom > enemyRect.top &&
-      playerRect.left < enemyRect.right &&
-      playerRect.right > enemyRect.left
+      playerBoundary.top < enemyBoundary.bottom &&
+      playerBoundary.bottom > enemyBoundary.top &&
+      playerBoundary.left < enemyBoundary.right &&
+      playerBoundary.right > enemyBoundary.left
     ) {
       if (!gameOverState && !collisionCooldown) {
         EnemyHit();
@@ -803,7 +805,7 @@ function nextLevel() {
     .getElementsByClassName("level")[0]
     .getElementsByTagName("p")[0].textContent = level;
 
-  randomizeWallBorders();
+  randomizeWalls();
 
   const player = document.getElementById("player");
   const playerMouth = player.getElementsByClassName("mouth")[0];
@@ -870,17 +872,17 @@ function nextLevel() {
   setInterval(movePlayer, 10);
 
   function checkWallCollisionForPlayer() {
-    const playerRect = player.getBoundingClientRect();
+    const playerBoundary = player.getBoundingClientRect();
     const walls = document.getElementsByClassName("wall");
 
     for (let wall of walls) {
-      const wallRect = wall.getBoundingClientRect();
+      const WallBoundary = wall.getBoundingClientRect();
 
       if (
-        playerRect.top < wallRect.bottom &&
-        playerRect.bottom > wallRect.top &&
-        playerRect.left < wallRect.right &&
-        playerRect.right > wallRect.left
+        playerBoundary.top < WallBoundary.bottom &&
+        playerBoundary.bottom > WallBoundary.top &&
+        playerBoundary.left < WallBoundary.right &&
+        playerBoundary.right > WallBoundary.left
       ) {
         // Collision detected with wall
         return true;
@@ -892,7 +894,7 @@ function nextLevel() {
   }
 
   function checkPointCollision() {
-    const playerRect = player.getBoundingClientRect();
+    const playerBoundary = player.getBoundingClientRect();
     const points = document.getElementsByClassName("point");
 
     if (points.length === 0) {
@@ -900,13 +902,13 @@ function nextLevel() {
     }
 
     for (let point of points) {
-      const pointRect = point.getBoundingClientRect();
+      const pointBoundary = point.getBoundingClientRect();
 
       if (
-        playerRect.top < pointRect.bottom &&
-        playerRect.bottom > pointRect.top &&
-        playerRect.left < pointRect.right &&
-        playerRect.right > pointRect.left
+        playerBoundary.top < pointBoundary.bottom &&
+        playerBoundary.bottom > pointBoundary.top &&
+        playerBoundary.left < pointBoundary.right &&
+        playerBoundary.right > pointBoundary.left
       ) {
         point.classList.remove("point");
         score += 10;
@@ -932,12 +934,6 @@ function nextLevel() {
     clearInterval(timerInterval);
   }
 
-  function formatTimeForLeaderboard(seconds) {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}m ${remainingSeconds}s`;
-  }
-
   function gameOver() {
     ghostSound.pause();
     ghostSound.currentTime = 0;
@@ -957,17 +953,17 @@ function nextLevel() {
         playerName = "Anonymous";
       }
 
-      // Retrieve scores from local storage
-      let scores = JSON.parse(localStorage.getItem("scores")) || [];
+      // Retrieve playerInfo from local storage
+      let playerInfo = JSON.parse(localStorage.getItem("playerInfo")) || [];
 
       // Check if the player name already exists
-      const existingPlayerIndex = scores.findIndex(
+      const existingPlayerIndex = playerInfo.findIndex(
         (entry) => entry.name === playerName
       );
 
       if (existingPlayerIndex !== -1) {
         // Replace the old data with the new data
-        scores[existingPlayerIndex] = {
+        playerInfo[existingPlayerIndex] = {
           name: playerName,
           score: score,
           time: timePlayed,
@@ -975,7 +971,7 @@ function nextLevel() {
         };
       } else {
         // Add new data
-        scores.push({
+        playerInfo.push({
           name: playerName,
           score: score,
           time: timePlayed,
@@ -983,58 +979,14 @@ function nextLevel() {
         });
       }
 
-      // Save the updated scores to local storage
-      localStorage.setItem("scores", JSON.stringify(scores));
+      // Save the updated playerInfo to local storage
+      localStorage.setItem("playerInfo", JSON.stringify(playerInfo));
 
       updateLeaderboard();
       restartBtn.style.display = "flex";
     }, 3000);
   }
 
-  const leaderboard = document.getElementById("leaderboard");
-  if (leaderboard) {
-    leaderboard.style.wordWrap = "break-word";
-    leaderboard.style.wordBreak = "break-all";
-  }
-
-  // Function to update the leaderboard
-  function updateLeaderboard() {
-    const leaderboard = document
-      .getElementsByClassName("leaderboard")[0]
-      .getElementsByTagName("ol")[0];
-    if (!leaderboard) return;
-
-    // Retrieve scores from local storage
-    let scores = JSON.parse(localStorage.getItem("scores")) || [];
-
-    // Sort scores first by score in descending order, then by time in ascending order
-    scores.sort((a, b) => {
-      if (b.score === a.score) {
-        return a.time - b.time; // Less time is better
-      }
-      return b.score - a.score;
-    });
-
-    // Clear the current leaderboard
-    leaderboard.innerHTML = "";
-
-    // Populate the leaderboard with the sorted scores
-    scores.forEach((entry) => {
-      const li = document.createElement("li");
-      li.innerHTML = `${
-        entry.name
-      }<br><p style="font-size: 1em; margin-top: 0.5em; margin-left: 0em;">Score: ${
-        entry.score
-      }<br><p style="font-size: 1em; margin-top: 0.5em; margin-left: 0em;"> Level: ${
-        entry.level
-      }<br> <p style="font-size: 1em; margin-top: 0.5em; margin-left: 0em;">Time : ${formatTimeForLeaderboard(
-        entry.time
-      )}</p>`;
-      leaderboard.appendChild(li);
-    });
-  }
-
-  // Call updateLeaderboard to display the leaderboard
   updateLeaderboard();
 
   function removeLife() {
@@ -1082,17 +1034,17 @@ function nextLevel() {
   let collisionInterval = setInterval(checkEnemyCollision, 100);
 
   function checkEnemyCollision() {
-    const playerRect = player.getBoundingClientRect();
+    const playerBoundary = player.getBoundingClientRect();
     const enemies = document.getElementsByClassName("enemy");
 
     for (let enemy of enemies) {
-      const enemyRect = enemy.getBoundingClientRect();
+      const enemyBoundary = enemy.getBoundingClientRect();
 
       if (
-        playerRect.top < enemyRect.bottom &&
-        playerRect.bottom > enemyRect.top &&
-        playerRect.left < enemyRect.right &&
-        playerRect.right > enemyRect.left
+        playerBoundary.top < enemyBoundary.bottom &&
+        playerBoundary.bottom > enemyBoundary.top &&
+        playerBoundary.left < enemyBoundary.right &&
+        playerBoundary.right > enemyBoundary.left
       ) {
         if (!gameOverState && !collisionCooldown) {
           EnemyHit();
@@ -1142,7 +1094,7 @@ clearBtn.addEventListener("click", function () {
     "Are you sure you want to clear the leaderboard?"
   );
   if (confirmation) {
-    localStorage.removeItem("scores");
+    localStorage.removeItem("playerInfo");
     updateLeaderboard();
   }
 });
@@ -1172,7 +1124,9 @@ const buttons = [
 ];
 
 // Loop through each button configuration
-buttons.forEach(function (button) {
+for (let i = 0; i < buttons.length; i++) {
+  const button = buttons[i];
+
   // Get the button element by its ID
   const btnElement = document.getElementById(button.id);
 
@@ -1190,4 +1144,4 @@ buttons.forEach(function (button) {
   btnElement.addEventListener("mouseleave", function (event) {
     handleButtonEvent(event, button.direction, false);
   });
-});
+}
