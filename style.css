@@ -64,8 +64,9 @@ header {
   flex-direction: column;
   text-align: center;
   font-size: 0.6em;
-  height: 60vh;
-  margin-bottom: 20px;
+  height: 50vh;
+  margin-top: 0px;
+  margin-bottom: 10px;
 }
 
 .startDiv h1 {

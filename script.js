@@ -282,11 +282,12 @@ function randomNumber() {
 let direction = randomNumber();
 
 // Collision detection with walls for enemies
-function checkWallCollisionForEnemy(enemy) {
+function enemyCollidesWithWall(enemy) {
   const enemyBoundary = enemy.getBoundingClientRect();
   const walls = document.getElementsByClassName("wall");
 
-  for (let wall of walls) {
+  for (let i = 0; i < walls.length; i++) {
+    const wall = walls[i];
     const WallBoundary = wall.getBoundingClientRect();
 
     if (
@@ -307,49 +308,49 @@ function checkWallCollisionForEnemy(enemy) {
 // Function to move the enemies
 let isMoving = true;
 
-function moveEnemies() {
+function enemyMovement() {
   if (gameStarted && isMoving && !isPaused) {
     const enemies = document.getElementsByClassName("enemy");
 
-    for (let enemy of enemies) {
+    for (let i = 0; i < enemies.length; i++) {
+      let enemy = enemies[i];
       let enemyTop = parseInt(enemy.style.top) || 0;
       let enemyLeft = parseInt(enemy.style.left) || 0;
       let direction = enemy.direction || randomNumber();
 
-      if (direction === 1) {
-        // MOVE DOWN
-        enemy.style.top = enemyTop + 10 + "px";
-        if (checkWallCollisionForEnemy(enemy)) {
-          enemy.style.top = enemyTop + "px";
-          direction = randomNumber();
-        }
-      }
-
-      if (direction === 2) {
-        // MOVE UP
-        enemy.style.top = enemyTop - 10 + "px";
-        if (checkWallCollisionForEnemy(enemy)) {
-          enemy.style.top = enemyTop + "px";
-          direction = randomNumber();
-        }
-      }
-
-      if (direction === 3) {
-        // MOVE LEFT
-        enemy.style.left = enemyLeft - 10 + "px";
-        if (checkWallCollisionForEnemy(enemy)) {
-          enemy.style.left = enemyLeft + "px";
-          direction = randomNumber();
-        }
-      }
-
-      if (direction === 4) {
-        // MOVE RIGHT
-        enemy.style.left = enemyLeft + 10 + "px";
-        if (checkWallCollisionForEnemy(enemy)) {
-          enemy.style.left = enemyLeft + "px";
-          direction = randomNumber();
-        }
+      switch (direction) {
+        case 1:
+          // MOVE DOWN
+          enemy.style.top = enemyTop + 10 + "px";
+          if (enemyCollidesWithWall(enemy)) {
+            enemy.style.top = enemyTop + "px";
+            direction = randomNumber();
+          }
+          break;
+        case 2:
+          // MOVE UP
+          enemy.style.top = enemyTop - 10 + "px";
+          if (enemyCollidesWithWall(enemy)) {
+            enemy.style.top = enemyTop + "px";
+            direction = randomNumber();
+          }
+          break;
+        case 3:
+          // MOVE LEFT
+          enemy.style.left = enemyLeft - 10 + "px";
+          if (enemyCollidesWithWall(enemy)) {
+            enemy.style.left = enemyLeft + "px";
+            direction = randomNumber();
+          }
+          break;
+        case 4:
+          // MOVE RIGHT
+          enemy.style.left = enemyLeft + 10 + "px";
+          if (enemyCollidesWithWall(enemy)) {
+            enemy.style.left = enemyLeft + "px";
+            direction = randomNumber();
+          }
+          break;
       }
 
       enemy.direction = direction;
@@ -357,9 +358,9 @@ function moveEnemies() {
   }
 }
 
-// Periodically call moveEnemies to update enemy positions after 5.5 seconds
+// Periodically call enemyMovement to update enemy positions after 5.5 seconds
 setTimeout(() => {
-  setInterval(moveEnemies, 100);
+  setInterval(enemyMovement, 100);
 }, 5500);
 
 // ===========================================================================================
@@ -375,70 +376,69 @@ let playerTop = 0;
 let playerLeft = 0;
 
 // Function to move the player based on key presses
-function movePlayer() {
+function playerMovement() {
   if (gameStarted && isMoving && !isPaused) {
-    // Move player down
-    if (downPressed) {
-      playerTop = playerTop + 2;
-      player.style.top = playerTop + "px";
-      playerMouth.classList = "down";
-
-      if (checkWallCollisionForPlayer()) {
-        playerTop = playerTop - 2;
-        player.style.top = playerTop + "px";
-      }
-      checkPointCollision();
-    }
-    // Move player up
-    else if (upPressed) {
-      playerTop = playerTop - 2;
-      player.style.top = playerTop + "px";
-      playerMouth.classList = "up";
-
-      if (checkWallCollisionForPlayer()) {
+    switch (true) {
+      case downPressed:
         playerTop = playerTop + 2;
         player.style.top = playerTop + "px";
-      }
-      checkPointCollision();
-    }
-    // Move player left
-    else if (leftPressed) {
-      playerLeft = playerLeft - 2;
-      player.style.left = playerLeft + "px";
-      playerMouth.classList = "left";
+        playerMouth.classList = "down";
 
-      if (checkWallCollisionForPlayer()) {
-        playerLeft = playerLeft + 2;
-        player.style.left = playerLeft + "px";
-      }
-      checkPointCollision();
-    }
-    // Move player right
-    else if (rightPressed) {
-      playerLeft = playerLeft + 2;
-      player.style.left = playerLeft + "px";
-      playerMouth.classList = "right";
+        if (playerCollidesWithWall()) {
+          playerTop = playerTop - 2;
+          player.style.top = playerTop + "px";
+        }
+        playerCollideswithPoint();
+        break;
+      case upPressed:
+        playerTop = playerTop - 2;
+        player.style.top = playerTop + "px";
+        playerMouth.classList = "up";
 
-      if (checkWallCollisionForPlayer()) {
+        if (playerCollidesWithWall()) {
+          playerTop = playerTop + 2;
+          player.style.top = playerTop + "px";
+        }
+        playerCollideswithPoint();
+        break;
+      case leftPressed:
         playerLeft = playerLeft - 2;
         player.style.left = playerLeft + "px";
-      }
-      checkPointCollision();
+        playerMouth.classList = "left";
+
+        if (playerCollidesWithWall()) {
+          playerLeft = playerLeft + 2;
+          player.style.left = playerLeft + "px";
+        }
+        playerCollideswithPoint();
+        break;
+      case rightPressed:
+        playerLeft = playerLeft + 2;
+        player.style.left = playerLeft + "px";
+        playerMouth.classList = "right";
+
+        if (playerCollidesWithWall()) {
+          playerLeft = playerLeft - 2;
+          player.style.left = playerLeft + "px";
+        }
+        playerCollideswithPoint();
+        break;
     }
   }
 }
 
-// Periodically call movePlayer to update player position after 5.5 seconds
+// Periodically call playerMovement to update player position after 5.5 seconds
 setTimeout(() => {
-  setInterval(movePlayer, 10);
+  setInterval(playerMovement, 10);
 }, 5500);
 
 // Collision detection with walls for players
-function checkWallCollisionForPlayer() {
+function playerCollidesWithWall() {
   const playerBoundary = player.getBoundingClientRect();
   const walls = document.getElementsByClassName("wall");
 
-  for (let wall of walls) {
+  for (let i = 0; i < walls.length; i++) {
+    const wall = walls[i];
     const WallBoundary = wall.getBoundingClientRect();
 
     if (
@@ -489,7 +489,7 @@ const wakawakaSound = new Audio("assets/audio/wakawaka.wav");
 wakawakaSound.volume = 0.1; // Adjust the volume as needed
 let wakawakaTimer; // Timer to stop the sound
 
-function checkPointCollision() {
+function playerCollideswithPoint() {
   const playerBoundary = player.getBoundingClientRect();
   const points = document.getElementsByClassName("point");
 
@@ -497,7 +497,8 @@ function checkPointCollision() {
     nextLevel();
   }
 
-  for (let point of points) {
+  for (let i = 0; i < points.length; i++) {
+    const point = points[i];
     const pointBoundary = point.getBoundingClientRect();
 
     if (
@@ -717,13 +718,14 @@ function EnemyHit() {
 // Function to check for enemy collisions
 let gameOverState = false;
 let collisionCooldown = false;
-let collisionInterval = setInterval(checkEnemyCollision, 100);
+let collisionInterval = setInterval(playerCollidesWithEnemy, 100);
 
-function checkEnemyCollision() {
+function playerCollidesWithEnemy() {
   const playerBoundary = player.getBoundingClientRect();
   const enemies = document.getElementsByClassName("enemy");
 
-  for (let enemy of enemies) {
+  for (let i = 0; i < enemies.length; i++) {
+    const enemy = enemies[i];
     const enemyBoundary = enemy.getBoundingClientRect();
 
     if (
@@ -738,12 +740,12 @@ function checkEnemyCollision() {
 
         collisionCooldown = true;
         clearInterval(collisionInterval);
-        collisionInterval = setInterval(checkEnemyCollision, 4000);
+        collisionInterval = setInterval(playerCollidesWithEnemy, 4000);
 
         setTimeout(() => {
           collisionCooldown = false;
           clearInterval(collisionInterval);
-          collisionInterval = setInterval(checkEnemyCollision, 100);
+          collisionInterval = setInterval(playerCollidesWithEnemy, 100);
         }, 4000);
 
         if (lives == 0) {
@@ -756,7 +758,7 @@ function checkEnemyCollision() {
 }
 
 // Periodically check for enemy collisions
-setInterval(checkEnemyCollision, 100);
+setInterval(playerCollidesWithEnemy, 100);
 
 // ===========================================================================================
 
@@ -816,66 +818,68 @@ function nextLevel() {
   let isMoving = true;
 
   // Function to move the player based on key presses
-  function movePlayer() {
+  function playerMovement() {
     if (gameStarted && isMoving && !isPaused) {
-      // Move player down
-      if (downPressed) {
-        playerTop = playerTop + 2;
-        player.style.top = playerTop + "px";
-        playerMouth.classList = "down";
-
-        if (checkWallCollisionForPlayer()) {
-          playerTop = playerTop - 2;
-          player.style.top = playerTop + "px";
-        }
-        checkPointCollision();
-      }
-      // Move player up
-      else if (upPressed) {
-        playerTop = playerTop - 2;
-        player.style.top = playerTop + "px";
-        playerMouth.classList = "up";
-
-        if (checkWallCollisionForPlayer()) {
+      switch (true) {
+        case downPressed:
           playerTop = playerTop + 2;
           player.style.top = playerTop + "px";
-        }
-        checkPointCollision();
-      }
-      // Move player left
-      else if (leftPressed) {
-        playerLeft = playerLeft - 2;
-        player.style.left = playerLeft + "px";
-        playerMouth.classList = "left";
+          playerMouth.classList = "down";
 
-        if (checkWallCollisionForPlayer()) {
-          playerLeft = playerLeft + 2;
-          player.style.left = playerLeft + "px";
-        }
-        checkPointCollision();
-      }
-      // Move player right
-      else if (rightPressed) {
-        playerLeft = playerLeft + 2;
-        player.style.left = playerLeft + "px";
-        playerMouth.classList = "right";
+          if (playerCollidesWithWall()) {
+            playerTop = playerTop - 2;
+            player.style.top = playerTop + "px";
+          }
+          playerCollideswithPoint();
+          break;
 
-        if (checkWallCollisionForPlayer()) {
+        case upPressed:
+          playerTop = playerTop - 2;
+          player.style.top = playerTop + "px";
+          playerMouth.classList = "up";
+
+          if (playerCollidesWithWall()) {
+            playerTop = playerTop + 2;
+            player.style.top = playerTop + "px";
+          }
+          playerCollideswithPoint();
+          break;
+
+        case leftPressed:
           playerLeft = playerLeft - 2;
           player.style.left = playerLeft + "px";
-        }
-        checkPointCollision();
+          playerMouth.classList = "left";
+
+          if (playerCollidesWithWall()) {
+            playerLeft = playerLeft + 2;
+            player.style.left = playerLeft + "px";
+          }
+          playerCollideswithPoint();
+          break;
+
+        case rightPressed:
+          playerLeft = playerLeft + 2;
+          player.style.left = playerLeft + "px";
+          playerMouth.classList = "right";
+
+          if (playerCollidesWithWall()) {
+            playerLeft = playerLeft - 2;
+            player.style.left = playerLeft + "px";
+          }
+          playerCollideswithPoint();
+          break;
       }
     }
   }
-  // Periodically call movePlayer to update player position
-  setInterval(movePlayer, 10);
+  // Periodically call playerMovement to update player position
+  setInterval(playerMovement, 10);
 
-  function checkWallCollisionForPlayer() {
+  function playerCollidesWithWall() {
     const playerBoundary = player.getBoundingClientRect();
     const walls = document.getElementsByClassName("wall");
 
-    for (let wall of walls) {
+    for (let i = 0; i < walls.length; i++) {
+      const wall = walls[i];
       const WallBoundary = wall.getBoundingClientRect();
 
       if (
@@ -893,7 +897,7 @@ function nextLevel() {
     return false;
   }
 
-  function checkPointCollision() {
+  function playerCollideswithPoint() {
     const playerBoundary = player.getBoundingClientRect();
     const points = document.getElementsByClassName("point");
 
@@ -901,7 +905,8 @@ function nextLevel() {
       nextLevel();
     }
 
-    for (let point of points) {
+    for (let i = 0; i < points.length; i++) {
+      const point = points[i];
       const pointBoundary = point.getBoundingClientRect();
 
       if (
@@ -1031,13 +1036,14 @@ function nextLevel() {
 
   let gameOverState = false;
   let collisionCooldown = false;
-  let collisionInterval = setInterval(checkEnemyCollision, 100);
+  let collisionInterval = setInterval(playerCollidesWithEnemy, 100);
 
-  function checkEnemyCollision() {
+  function playerCollidesWithEnemy() {
     const playerBoundary = player.getBoundingClientRect();
     const enemies = document.getElementsByClassName("enemy");
 
-    for (let enemy of enemies) {
+    for (let i = 0; i < enemies.length; i++) {
+      const enemy = enemies[i];
       const enemyBoundary = enemy.getBoundingClientRect();
 
       if (
@@ -1052,12 +1058,12 @@ function nextLevel() {
 
           collisionCooldown = true;
           clearInterval(collisionInterval);
-          collisionInterval = setInterval(checkEnemyCollision, 4000);
+          collisionInterval = setInterval(playerCollidesWithEnemy, 4000);
 
           setTimeout(() => {
             collisionCooldown = false;
             clearInterval(collisionInterval);
-            collisionInterval = setInterval(checkEnemyCollision, 100);
+            collisionInterval = setInterval(playerCollidesWithEnemy, 100);
           }, 4000);
 
           if (lives == 0) {
@@ -1069,7 +1075,7 @@ function nextLevel() {
     }
   }
 
-  setInterval(checkEnemyCollision, 100);
+  setInterval(playerCollidesWithEnemy, 100);
 }
 
 // ===========================================================================================
