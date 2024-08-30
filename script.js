@@ -785,7 +785,7 @@ function nextLevel() {
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   ];
 
-  wallsCreated += 1;
+  wallsCreated += 2;
   let newWalls = Math.min(wallsCreated, 10);
   for (let i = 0; i < newWalls; i++) {
     randomizedMaze();
