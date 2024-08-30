@@ -539,51 +539,49 @@ function gameOver() {
   stopTimer();
   gameStarted = false;
   player.classList.add("dead");
+}
 
+function showGameOverPrompt() {
   const timePlayed = time; // Store the time played
   const currentLevel = level; // Store the current level
-  setTimeout(() => {
-    let playerName = prompt(
-      "                    Game Over\nEnter your name below:"
-    );
+  let playerName = prompt("Enter your name below:");
 
-    // Set playerName to "Anonymous" if the prompt is cancelled or empty
-    if (!playerName) {
-      playerName = "Anonymous";
-    }
+  // Set playerName to "Anonymous" if the prompt is cancelled or empty
+  if (!playerName) {
+    playerName = "Anonymous";
+  }
 
-    // Retrieve playerInfo from local storage
-    let playerInfo = JSON.parse(localStorage.getItem("playerInfo")) || [];
+  // Retrieve playerInfo from local storage
+  let playerInfo = JSON.parse(localStorage.getItem("playerInfo")) || [];
 
-    // Check if the player name already exists
-    const existingPlayerIndex = playerInfo.findIndex(
-      (entry) => entry.name === playerName
-    );
+  // Check if the player name already exists
+  const existingPlayerIndex = playerInfo.findIndex(
+    (entry) => entry.name === playerName
+  );
 
-    if (existingPlayerIndex !== -1) {
-      // Replace the old data with the new data
-      playerInfo[existingPlayerIndex] = {
-        name: playerName,
-        score: score,
-        time: timePlayed,
-        level: currentLevel,
-      };
-    } else {
-      // Add new data
-      playerInfo.push({
-        name: playerName,
-        score: score,
-        time: timePlayed,
-        level: currentLevel,
-      });
-    }
+  if (existingPlayerIndex !== -1) {
+    // Replace the old data with the new data
+    playerInfo[existingPlayerIndex] = {
+      name: playerName,
+      score: score,
+      time: timePlayed,
+      level: currentLevel,
+    };
+  } else {
+    // Add new data
+    playerInfo.push({
+      name: playerName,
+      score: score,
+      time: timePlayed,
+      level: currentLevel,
+    });
+  }
 
-    // Save the updated playerInfo to local storage
-    localStorage.setItem("playerInfo", JSON.stringify(playerInfo));
+  // Save the updated playerInfo to local storage
+  localStorage.setItem("playerInfo", JSON.stringify(playerInfo));
 
-    updateLeaderboard();
-    restartBtn.style.display = "flex";
-  }, 3000);
+  updateLeaderboard();
+  restartBtn.style.display = "flex";
 }
 
 //===========================================================================================
@@ -711,6 +709,14 @@ function EnemyHit() {
       ghostSound.pause();
       ghostSound.currentTime = 0;
       deathSound.play();
+
+      gameOverImage.style.display = "flex";
+
+      // Wait for 6 seconds before showing the prompt
+      setTimeout(() => {
+        gameOverImage.style.display = "none"; // Hide the game over image
+        showGameOverPrompt();
+      }, 6000);
     }
   }, 2000);
 }

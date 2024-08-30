@@ -64,7 +64,7 @@ header {
   flex-direction: column;
   text-align: center;
   font-size: 0.6em;
-  height: 410px;
+  height: 412px;
   margin-top: 0px;
   margin-bottom: 10px;
 }
@@ -374,4 +374,17 @@ footer {
 #playIcon,
 #pauseIcon {
   display: none;
+}
+
+.gameOver {
+  display: none;
+  position: fixed;
+  top: 0;
+  background-color: black;
+  z-index: 200;
+}
+
+.gameOver img {
+  width: 1550px;
+  height: 100%;
 }
