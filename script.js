@@ -129,7 +129,7 @@ const clearBtn = document.getElementById("clear");
 
 const main = document.getElementsByTagName("main")[0];
 
-// Maze layout: 1 = Wall, 2 = Player, 3 = Enemy, 0 = Point, 4 = Solvable path
+// Maze layout: 1 = Wall, 2 = Player, 3 = Enemy, 0 = Points to be converted to walls, 4 = Points that form a solvable path
 let maze = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   [1, 2, 4, 4, 0, 0, 0, 4, 0, 1],
@@ -780,7 +780,7 @@ function nextLevel() {
     [1, 0, 4, 4, 0, 0, 4, 4, 4, 1],
     [1, 0, 4, 0, 4, 4, 0, 4, 4, 1],
     [1, 0, 4, 4, 0, 4, 4, 4, 0, 1],
-    [1, 4, 0, 0, 4, 0, 4, 4, 0, 1],
+    [1, 4, 0, 0, 4, 4, 4, 4, 0, 1],
     [1, 4, 4, 4, 0, 0, 0, 4, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   ];
