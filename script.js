@@ -234,7 +234,8 @@ function randomizeWalls() {
   const randomBackgroundColor = getRandomHexColor();
 
   const walls = document.getElementsByClassName("wall");
-  for (let wall of walls) {
+  for (let i = 0; i < walls.length; i++) {
+    let wall = walls[i];
     wall.style.borderStyle = randomBorderStyle;
     wall.style.borderColor = randomBorderColor;
     wall.style.backgroundColor = randomBackgroundColor;
