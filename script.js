@@ -684,10 +684,10 @@ function removeLife() {
 
 // ENEMY COLLISION
 
-const hitSound = new Audio("assets/audio/hit.mp3");
+const hitSound = new Audio("assets/audio/hit.wav");
 hitSound.volume = 0.1;
-const deathSound = new Audio("assets/audio/death.wav");
-deathSound.volume = 0.1;
+const deathSound = new Audio("assets/audio/death.mp3");
+deathSound.volume = 1;
 // Function to handle the hit animation and disable movement
 function EnemyHit() {
   player.classList.add("hit");
@@ -698,7 +698,7 @@ function EnemyHit() {
   hitSound.play();
 
   setTimeout(() => {
-    // Stop hit.mp3 after 2 seconds
+    // Stop hit.wav after 2 seconds
     hitSound.pause();
     hitSound.currentTime = 0;
 
@@ -1007,11 +1007,11 @@ function nextLevel() {
     isMoving = false;
     removeLife();
 
-    // Play hit.mp3
+    // Play hit.wav
     hitSound.play();
 
     setTimeout(() => {
-      // Stop hit.mp3 after 2 seconds
+      // Stop hit.wav after 2 seconds
       hitSound.pause();
       hitSound.currentTime = 0;
 
