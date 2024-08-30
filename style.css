@@ -52,7 +52,7 @@ header {
 }
 
 .notice {
-  width: 100vh;
+  width: 810px;
   background-color: #ccc;
   line-height: 3em;
   z-index: 100;
