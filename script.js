@@ -641,14 +641,14 @@ let lives = 3;
 
 // Function to display lives
 function displayLives() {
-  const livesContainer = document.createElement("div");
-  livesContainer.id = "lives";
-  livesContainer.classList.add("lives");
+  const livesDisplay = document.createElement("div");
+  livesDisplay.id = "lives";
+  livesDisplay.classList.add("lives");
 
   // Create and add the h1 element
   const livesHeader = document.createElement("h1");
   livesHeader.textContent = "Lives:";
-  livesContainer.appendChild(livesHeader);
+  livesDisplay.appendChild(livesHeader);
 
   const livesList = document.createElement("ul");
 
@@ -658,8 +658,8 @@ function displayLives() {
     livesList.appendChild(life);
   }
 
-  livesContainer.appendChild(livesList);
-  document.body.appendChild(livesContainer);
+  livesDisplay.appendChild(livesList);
+  document.body.appendChild(livesDisplay);
 }
 
 // Call displayLives at the start of the game
@@ -667,9 +667,9 @@ displayLives();
 
 // Function to remove one life
 function removeLife() {
-  const livesContainer = document.getElementById("lives");
-  if (livesContainer) {
-    const livesUL = livesContainer.getElementsByTagName("ul")[0];
+  const livesDisplay = document.getElementById("lives");
+  if (livesDisplay) {
+    const livesUL = livesDisplay.getElementsByTagName("ul")[0];
     if (livesUL && livesUL.children.length > 0) {
       livesUL.removeChild(livesUL.children[0]);
     }
@@ -991,9 +991,9 @@ function nextLevel() {
   updateLeaderboard();
 
   function removeLife() {
-    const livesContainer = document.getElementById("lives");
-    if (livesContainer) {
-      const livesUL = livesContainer.getElementsByTagName("ul")[0];
+    const livesDisplay = document.getElementById("lives");
+    if (livesDisplay) {
+      const livesUL = livesDisplay.getElementsByTagName("ul")[0];
       if (livesUL && livesUL.children.length > 0) {
         livesUL.removeChild(livesUL.children[0]);
       }
