@@ -155,9 +155,7 @@ function randomizedMaze() {
   }
 }
 
-for (let i = 0; i < 5; i++) {
-  randomizedMaze();
-}
+randomizedMaze();
 
 // Randomized the enemy placement each time the webpage is refreshed
 function randomizedEnemy() {
@@ -771,7 +769,7 @@ setInterval(playerCollidesWithEnemy, 100);
 
 let level = 1;
 enemiesCreated = 1;
-wallsCreated = 5;
+wallsCreated = 1;
 function nextLevel() {
   main.innerHTML = "";
   maze = [
