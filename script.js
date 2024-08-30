@@ -129,15 +129,15 @@ const clearBtn = document.getElementById("clear");
 
 const main = document.getElementsByTagName("main")[0];
 
-// Maze layout: 1 = Wall, 2 = Player, 3 = Enemy, 0 = Point
+// Maze layout: 1 = Wall, 2 = Player, 3 = Enemy, 0 = Point, 4 = Solvable path
 let maze = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  [1, 2, 4, 1, 0, 0, 0, 4, 0, 1],
+  [1, 2, 4, 4, 0, 0, 0, 4, 0, 1],
   [1, 0, 4, 0, 4, 4, 4, 4, 4, 1],
   [1, 0, 4, 4, 0, 0, 4, 4, 4, 1],
-  [1, 0, 4, 1, 0, 0, 4, 4, 4, 1],
-  [1, 0, 4, 0, 4, 4, 0, 1, 1, 1],
-  [1, 0, 4, 1, 0, 4, 4, 4, 0, 1],
+  [1, 0, 4, 4, 0, 0, 4, 4, 4, 1],
+  [1, 0, 4, 0, 4, 4, 0, 4, 4, 1],
+  [1, 0, 4, 4, 0, 4, 4, 4, 0, 1],
   [1, 4, 0, 0, 4, 0, 4, 4, 0, 1],
   [1, 4, 4, 4, 0, 0, 0, 4, 0, 1],
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -171,9 +171,7 @@ function randomizedEnemy() {
   }
 }
 
-for (let i = 0; i < 3; i++) {
-  randomizedEnemy();
-}
+randomizedEnemy();
 
 // Populates the maze in the HTML based on the maze array
 function generateMaze() {
@@ -766,38 +764,33 @@ setInterval(playerCollidesWithEnemy, 100);
 // NEXT LEVEL
 
 let level = 1;
-
+enemiesCreated = 1;
+wallsCreated = 5;
 function nextLevel() {
   main.innerHTML = "";
   maze = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 2, 4, 1, 0, 0, 0, 4, 0, 1],
+    [1, 2, 4, 4, 0, 0, 0, 4, 0, 1],
     [1, 0, 4, 0, 4, 4, 4, 4, 4, 1],
     [1, 0, 4, 4, 0, 0, 4, 4, 4, 1],
-    [1, 0, 4, 1, 0, 0, 4, 4, 4, 1],
-    [1, 0, 4, 0, 4, 4, 0, 1, 1, 1],
-    [1, 0, 4, 1, 0, 4, 4, 4, 0, 1],
+    [1, 0, 4, 4, 0, 0, 4, 4, 4, 1],
+    [1, 0, 4, 0, 4, 4, 0, 4, 4, 1],
+    [1, 0, 4, 4, 0, 4, 4, 4, 0, 1],
     [1, 4, 0, 0, 4, 0, 4, 4, 0, 1],
     [1, 4, 4, 4, 0, 0, 0, 4, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   ];
 
-  for (let i = 0; i < 5; i++) {
+  wallsCreated += 1;
+  let newWalls = Math.min(wallsCreated, 10);
+  for (let i = 0; i < newWalls; i++) {
     randomizedMaze();
   }
 
-  function randomizedEnemy() {
-    let row = Math.floor(Math.random() * maze.length);
-    let column = Math.floor(Math.random() * maze[row].length);
+  enemiesCreated++;
 
-    if (maze[row][column] == 0) {
-      maze[row][column] = 3;
-    } else {
-      randomizedEnemy();
-    }
-  }
-
-  for (let i = 0; i < 3; i++) {
+  let newEnemies = Math.min(enemiesCreated, 4);
+  for (let i = 0; i < newEnemies; i++) {
     randomizedEnemy();
   }
 
